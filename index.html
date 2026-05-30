@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>DairyBook – दुग्ध प्रबंधन प्रणाली</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FDF6EC;
+  --milk: #FFFDF8;
+  --brown: #5C3D2E;
+  --brown-light: #8B6347;
+  --brown-pale: #E8D5C0;
+  --green: #2E7D5C;
+  --green-light: #4CAF85;
+  --green-pale: #D4EDE3;
+  --amber: #D4820A;
+  --amber-pale: #FFF0CC;
+  --blue: #1A6FA8;
+  --blue-pale: #DDEEFF;
+  --red: #C0392B;
+  --red-pale: #FDECEA;
+  --purple: #6B3FA0;
+  --purple-pale: #EDE5F8;
+  --text: #2C1810;
+  --text-soft: #7A5C50;
+  --border: #E0CCBB;
+  --shadow: 0 2px 12px rgba(92,61,46,0.10);
+  --radius: 14px;
+  --font-head: 'Baloo 2', cursive;
+  --font-body: 'Noto Sans', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.lang-toggle {
+  position: fixed;
+  top: 70px;
+  right: 10px;
+  z-index: 200;
+  background: var(--brown);
+  border-radius: 30px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+  box-shadow: var(--shadow);
+}
+.lang-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  background: transparent;
+  color: #fff;
+  opacity: 0.6;
+}
+.lang-btn.active {
+  background: var(--amber);
+  opacity: 1;
+}
+
+.topbar {
+  background: var(--brown);
+  color: #fff;
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar h1 { font-family: var(--font-head); font-size: 22px; font-weight: 700; }
+.topbar .sub { font-size: 11px; opacity: 0.7; margin-top: -2px; }
+.topbar-right { font-size: 12px; opacity: 0.8; text-align: right; }
+.fy-badge {
+  background: var(--amber);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  margin-left: 8px;
+}
+
+.bottomnav {
+  position: fixed;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  background: var(--brown);
+  display: flex;
+  z-index: 100;
+}
+.bnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 4px 10px;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+  border: none;
+  background: none;
+  color: #fff;
+  font-family: var(--font-body);
+}
+.bnav-item.active { opacity: 1; }
+.bnav-item .icon { font-size: 22px; margin-bottom: 2px; }
+.bnav-item .label { font-size: 10px; font-weight: 500; }
+
+.screen { display: none; padding: 12px 14px; }
+.screen.active { display: block; }
+
+.card {
+  background: var(--milk);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brown);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sec-header {
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--brown);
+  margin: 6px 0 12px;
+}
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.stat-box {
+  background: var(--milk);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.stat-num { font-family: var(--font-head); font-size: 26px; font-weight: 700; }
+.stat-label { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+.stat-box.green { background: var(--green-pale); border-color: var(--green-light); }
+.stat-box.green .stat-num { color: var(--green); }
+.stat-box.amber { background: var(--amber-pale); border-color: var(--amber); }
+.stat-box.amber .stat-num { color: var(--amber); }
+.stat-box.blue { background: var(--blue-pale); border-color: var(--blue); }
+.stat-box.blue .stat-num { color: var(--blue); }
+.stat-box.brown { background: #F5EAE0; border-color: var(--brown-light); }
+.stat-box.brown .stat-num { color: var(--brown); }
+
+.form-row { margin-bottom: 10px; }
+.form-label { font-size: 12px; color: var(--text-soft); margin-bottom: 4px; font-weight: 500; }
+.form-input, .form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--milk);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+}
+.form-input:focus, .form-select:focus { border-color: var(--brown-light); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--green); color: #fff; }
+.btn-amber { background: var(--amber); color: #fff; }
+.btn-brown { background: var(--brown); color: #fff; }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+.btn-full { width: 100%; }
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+.btn-wa { background: #25D366; color: #fff; }
+.btn-danger { background: var(--red); color: #fff; }
+
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-cow { background: var(--blue-pale); color: var(--blue); }
+.badge-buffalo { background: var(--purple-pale); color: var(--purple); }
+.badge-morning { background: var(--amber-pale); color: var(--amber); }
+.badge-evening { background: #EDE5F8; color: var(--purple); }
+.badge-fy { background: var(--green-pale); color: var(--green); }
+
+.mini-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.mini-table th { color: var(--text-soft); font-weight: 600; font-size: 11px; text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.mini-table td { padding: 7px 6px; border-bottom: 1px solid #F0E8E0; color: var(--text); }
+.mini-table tr:last-child td { border-bottom: none; }
+
+.list-item {
+  background: var(--milk);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.list-item-left { flex: 1; }
+.list-item-name { font-weight: 600; font-size: 14px; }
+.list-item-sub { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+.list-item-right { text-align: right; font-family: var(--font-head); font-size: 16px; font-weight: 700; color: var(--green); }
+
+.chat-wrap {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0 12px;
+}
+.msg { margin-bottom: 10px; display: flex; flex-direction: column; }
+.msg.user { align-items: flex-end; }
+.msg.ai { align-items: flex-start; }
+.msg-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.msg.user .msg-bubble { background: var(--brown); color: #fff; border-bottom-right-radius: 4px; }
+.msg.ai .msg-bubble { background: var(--milk); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+.msg-time { font-size: 10px; color: var(--text-soft); margin-top: 3px; padding: 0 4px; }
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0 2px;
+  border-top: 1px solid var(--border);
+}
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--milk);
+  color: var(--text);
+  outline: none;
+}
+.chat-input:focus { border-color: var(--brown-light); }
+.chat-send {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--brown);
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip {
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--milk);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-soft);
+  font-family: var(--font-body);
+}
+.chip:active { background: var(--brown-pale); }
+
+.toast {
+  position: fixed;
+  bottom: 90px;
+  left: 50%; transform: translateX(-50%);
+  background: var(--brown);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+.divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+.typing-dots span {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-soft);
+  margin: 0 2px;
+  animation: blink 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+
+.ai-thinking { background: var(--milk); border: 1px solid var(--border); border-radius: 16px; padding: 10px 14px; display: inline-block; border-bottom-left-radius: 4px; }
+
+.bill-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed var(--border); }
+.bill-row:last-child { border: none; font-weight: 700; font-size: 15px; padding-top: 10px; }
+.bill-total { color: var(--green); }
+
+.session-toggle { display: flex; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--border); margin-bottom: 12px; }
+.session-toggle button {
+  flex: 1; padding: 9px; border: none; background: transparent;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s, color 0.15s; color: var(--text-soft);
+}
+.session-toggle button.active { background: var(--brown); color: #fff; }
+
+.share-buttons { display: flex; gap: 8px; margin-top: 12px; }
+
+/* Fiscal Year Card Special */
+.fy-card {
+  background: linear-gradient(135deg, var(--green-pale) 0%, var(--milk) 100%);
+  border-left: 4px solid var(--green);
+}
+.fy-stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  padding: 8px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 8px;
+}
+.warning-box {
+  background: var(--red-pale);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 8px 0;
+  font-size: 12px;
+  color: var(--red);
+}
+</style>
+</head>
+<body>
+
+<!-- Language Toggle -->
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+  <button class="lang-btn" onclick="setLanguage('hi')">हिंदी</button>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar h1" style="font-family:var(--font-head);font-size:22px;font-weight:700;">🥛 DairyBook</div>
+    <div class="sub" id="appSubtitle">Milk Management System <span class="fy-badge" id="fyBadge"></span></div>
+  </div>
+  <div class="topbar-right" id="todayDate"></div>
+</div>
+
+<!-- SCREENS -->
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="sec-header" id="homeTitle">Today's Summary</div>
+
+  <div class="stat-grid">
+    <div class="stat-box green">
+      <div class="stat-num" id="home-total-litres">0 L</div>
+      <div class="stat-label" id="homeTotalLabel">Total milk today</div>
+    </div>
+    <div class="stat-box amber">
+      <div class="stat-num" id="home-sessions">0</div>
+      <div class="stat-label" id="homeSessionsLabel">Sessions recorded</div>
+    </div>
+    <div class="stat-box blue">
+      <div class="stat-num" id="home-cow-litres">0 L</div>
+      <div class="stat-label" id="homeCowLabel">Cow milk</div>
+    </div>
+    <div class="stat-box brown">
+      <div class="stat-num" id="home-buffalo-litres">0 L</div>
+      <div class="stat-label" id="homeBuffaloLabel">Buffalo milk</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="morningTitle">🌅 Morning session</div>
+    <div id="home-morning-list"><div style="font-size:13px;color:var(--text-soft)" id="noMorningText">No entries yet</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title" id="eveningTitle">🌇 Evening session</div>
+    <div id="home-evening-list"><div style="font-size:13px;color:var(--text-soft)" id="noEveningText">No entries yet</div></div>
+  </div>
+
+  <button class="btn btn-primary btn-full" onclick="goTo('entry')" id="recordMilkBtn">➕ Record Milk Session</button>
+</div>
+
+<!-- ENTRY -->
+<div class="screen" id="screen-entry">
+  <div class="sec-header" id="recordTitle">Record Milk Session</div>
+
+  <div class="card">
+    <div class="form-row">
+      <div class="form-label" id="dateLabel">Date</div>
+      <input type="date" class="form-input" id="entry-date">
+    </div>
+    <div class="session-toggle">
+      <button class="active" id="btn-morning" onclick="setSession('morning')">🌅 Morning</button>
+      <button id="btn-evening" onclick="setSession('evening')">🌇 Evening</button>
+    </div>
+    <div class="form-row">
+      <div class="form-label" id="personLabel">Feeding Person</div>
+      <select class="form-select" id="entry-person">
+        <option value="" id="selectPersonOption">-- Select person --</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="cowTitle">🐄 Cow milk entries</div>
+    <div id="cow-entries"></div>
+    <button class="btn btn-outline btn-sm" onclick="addAnimalRow('cow')" id="addCowBtn">+ Add cow</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="buffaloTitle">🐃 Buffalo milk entries</div>
+    <div id="buffalo-entries"></div>
+    <button class="btn btn-outline btn-sm" onclick="addAnimalRow('buffalo')" id="addBuffaloBtn">+ Add buffalo</button>
+  </div>
+
+  <button class="btn btn-primary btn-full" onclick="saveSession()" style="margin-top:6px" id="saveSessionBtn">✅ Save Session</button>
+</div>
+
+<!-- CLIENTS -->
+<div class="screen" id="screen-clients">
+  <div class="sec-header" id="dispatchTitle">Client Dispatch</div>
+
+  <div class="card">
+    <div class="card-title" id="recordDispatchTitle">📋 Record today's dispatch</div>
+    <div class="form-row">
+      <div class="form-label" id="dispatchDateLabel">Date</div>
+      <input type="date" class="form-input" id="dispatch-date">
+    </div>
+    <div class="session-toggle">
+      <button class="active" id="btn-d-morning" onclick="setDispatchSession('morning')">🌅 Morning</button>
+      <button id="btn-d-evening" onclick="setDispatchSession('evening')">🌇 Evening</button>
+    </div>
+    <div id="dispatch-client-rows"></div>
+    <button class="btn btn-primary btn-full" onclick="saveDispatch()" style="margin-top:6px" id="saveDispatchBtn">✅ Save Dispatch</button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="card-title" style="padding: 0 2px 8px; font-family:var(--font-head); font-size:15px; font-weight:600; color:var(--brown);" id="clientListTitle">👥 Client list</div>
+  <div id="client-list-display"></div>
+  <button class="btn btn-outline btn-full" onclick="showAddClient()" id="addClientBtn">+ Add new client</button>
+
+  <div id="add-client-form" style="display:none;margin-top:12px">
+    <div class="card">
+      <div class="card-title" id="addClientFormTitle">Add Client</div>
+      <div class="form-row">
+        <div class="form-label" id="clientNameLabel">Name</div>
+        <input type="text" class="form-input" id="cl-name" placeholder="Client name">
+      </div>
+      <div class="form-row">
+        <div class="form-label" id="clientPhoneLabel">Phone</div>
+        <input type="tel" class="form-input" id="cl-phone" placeholder="Mobile number">
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-label" id="milkTypeLabel">Milk type</div>
+          <select class="form-select" id="cl-type">
+            <option value="cow">Cow</option>
+            <option value="buffalo">Buffalo</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-label" id="dailyQtyLabel">Daily qty (L)</div>
+          <input type="number" class="form-input" id="cl-qty" placeholder="e.g. 2">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="addClient()" id="submitClientBtn">Add Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- BILLING -->
+<div class="screen" id="screen-billing">
+  <div class="sec-header" id="billingTitle">Monthly Billing</div>
+
+  <div class="card">
+    <div class="card-title" id="generateBillTitle">📅 Generate Bill</div>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="form-label" id="selectClientLabel">Client</div>
+        <select class="form-select" id="bill-client">
+          <option value="" id="allClientsOption">All clients</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-label" id="monthLabel">Month</div>
+        <input type="month" class="form-input" id="bill-month">
+      </div>
+    </div>
+    <button class="btn btn-amber btn-full" onclick="generateBill()" id="generateBillBtn">🧾 Generate Bill</button>
+  </div>
+
+  <div id="bill-output"></div>
+
+  <div class="card">
+    <div class="card-title" id="fatRateTitle">⚙️ Fat Rate Config</div>
+    <table class="mini-table" id="fat-rate-table">
+      <thead><tr><th id="milkTypeCol">Milk type</th><th id="fatPercentCol">Fat %</th><th id="rateCol">Rate (₹/L)</th><th></th></tr></thead>
+      <tbody id="fat-rate-body"></tbody>
+    </table>
+    <div style="margin-top:10px">
+      <div class="form-grid">
+        <select class="form-select" id="fr-type"><option value="cow">Cow</option><option value="buffalo">Buffalo</option></select>
+        <input type="number" class="form-input" id="fr-fat" placeholder="Fat %" step="0.5">
+      </div>
+      <div class="form-row" style="margin-top:8px">
+        <input type="number" class="form-input" id="fr-rate" placeholder="Rate ₹/litre">
+      </div>
+      <button class="btn btn-outline btn-full btn-sm" onclick="addFatRate()" style="margin-top:6px" id="addRateBtn">+ Add rate</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI ASSISTANT -->
+<div class="screen" id="screen-ai">
+  <div class="sec-header" id="aiTitle">🤖 AI Assistant</div>
+
+  <div class="chip-row" id="quick-chips">
+    <span class="chip" onclick="askAI('Generate bill for this month')" id="chipBill">📄 Monthly bill</span>
+    <span class="chip" onclick="askAI('Which animal gave the most milk today?')" id="chipTopAnimal">🐄 Top animal</span>
+    <span class="chip" onclick="askAI('Show outstanding payments')" id="chipOutstanding">💰 Outstanding</span>
+    <span class="chip" onclick="askAI('What is total milk this month?')" id="chipMonthTotal">📊 Month total</span>
+    <span class="chip" onclick="askAI('Compare cow vs buffalo production this month')" id="chipCompare">📈 Compare milk</span>
+    <span class="chip" onclick="askAI('Which client takes the most milk?')" id="chipTopClient">👥 Top client</span>
+  </div>
+
+  <div class="chat-wrap">
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">
+        <div class="msg-bubble" id="welcomeMsg">
+          Namaste! 🙏 I am your DairyBook AI assistant.<br><br>
+          You can ask me anything about your dairy — bills, animal productivity, client outstanding, milk totals, or any report. What would you like to know?
+        </div>
+        <div class="msg-time">Now</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about your dairy..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS / SETUP -->
+<div class="screen" id="screen-setup">
+  <div class="sec-header" id="setupTitle">Setup</div>
+
+  <!-- FISCAL YEAR MANAGEMENT CARD -->
+  <div class="card fy-card">
+    <div class="card-title">📅 <span id="fyManageTitle">Fiscal Year Management</span> <span class="badge badge-fy" id="currentFyBadge"></span></div>
+    <div class="fy-stats">
+      <div><strong id="fyCurrentLabel">Current FY:</strong> <span id="displayCurrentFy">-</span></div>
+      <div><strong id="fyStartLabel">Started:</strong> <span id="displayFyStart">-</span></div>
+    </div>
+    <div class="fy-stats">
+      <div><strong id="fySessionsLabel">Sessions this FY:</strong> <span id="fySessionsCount">0</span></div>
+      <div><strong id="fyDispatchesLabel">Dispatches this FY:</strong> <span id="fyDispatchesCount">0</span></div>
+    </div>
+    <div id="fyWarningBox" class="warning-box" style="display:none"></div>
+    <div class="form-grid" style="margin-top:8px">
+      <button class="btn btn-amber btn-sm" onclick="showFiscalYearDialog()" id="fyArchiveBtn">📦 Archive & Start New FY</button>
+      <button class="btn btn-outline btn-sm" onclick="viewArchivedData()" id="fyViewBtn">📜 View Archived Data</button>
+    </div>
+    <div class="form-row" style="margin-top:8px">
+      <div class="form-label" id="fyAutoCheckLabel">Auto-check on app start</div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <label><input type="radio" name="autoFyCheck" value="on" onchange="setAutoFyCheck(true)"> <span id="fyAutoOn">On</span></label>
+        <label><input type="radio" name="autoFyCheck" value="off" onchange="setAutoFyCheck(false)"> <span id="fyAutoOff">Off</span></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="animalsTitle">🐄 Animals</div>
+    <div id="animal-list-display"></div>
+    <div style="margin-top:10px">
+      <div class="form-grid">
+        <input type="text" class="form-input" id="an-name" placeholder="Animal name (e.g. Ganga)">
+        <select class="form-select" id="an-type">
+          <option value="cow">Cow</option>
+          <option value="buffalo">Buffalo</option>
+          <option value="ox">Ox</option>
+        </select>
+      </div>
+      <button class="btn btn-brown btn-full btn-sm" onclick="addAnimal()" style="margin-top:8px" id="addAnimalBtn">+ Add animal</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="personsTitle">👤 Feeding Persons</div>
+    <div id="person-list-display"></div>
+    <div style="margin-top:10px">
+      <div class="form-grid">
+        <input type="text" class="form-input" id="ps-name" placeholder="Person name">
+        <input type="tel" class="form-input" id="ps-phone" placeholder="Phone (optional)">
+      </div>
+      <button class="btn btn-brown btn-full btn-sm" onclick="addPerson()" style="margin-top:8px" id="addPersonBtn">+ Add person</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="apiTitle">🔑 AI API Key (OpenRouter)</div>
+    <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="apiHelpText">Enter your OpenRouter API key for free AI access (get at openrouter.ai)</div>
+    <input type="password" class="form-input" id="api-key-input" placeholder="sk-or-v1-...">
+    <button class="btn btn-brown btn-full btn-sm" onclick="saveApiKey()" style="margin-top:8px" id="saveApiBtn">Save API Key</button>
+    <div id="api-key-status" style="font-size:12px;margin-top:6px;color:var(--green)"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="googleSheetsTitle">📊 Google Sheets Setup</div>
+    <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="sheetsHelpText">Connect to Google Sheets for cloud backup & multi-device sync</div>
+    <input type="text" class="form-input" id="sheets-script-url" placeholder="Google Apps Script Web App URL">
+    <button class="btn btn-brown btn-full btn-sm" onclick="saveSheetsUrl()" style="margin-top:8px" id="connectSheetsBtn">🔗 Connect Google Sheets</button>
+    <div id="sheets-status" style="font-size:12px;margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:var(--red)" id="dataTitle">⚠️ Data</div>
+    <button class="btn btn-outline btn-full btn-sm" onclick="exportData()" id="exportBtn">📤 Export data (JSON)</button>
+    <button class="btn btn-outline btn-full btn-sm" onclick="loadSampleData()" style="margin-top:8px" id="sampleBtn">🎯 Load sample data</button>
+    <button class="btn btn-outline btn-full btn-sm" onclick="syncToSheets()" style="margin-top:8px" id="syncBtn">🔄 Sync to Google Sheets</button>
+    <button class="btn btn-danger btn-full btn-sm" onclick="resetAllData()" style="margin-top:8px" id="resetBtn">⚠️ Reset All Data</button>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottomnav">
+  <button class="bnav-item active" onclick="goTo('home')">
+    <div class="icon">🏠</div><div class="label" id="navHome">Home</div>
+  </button>
+  <button class="bnav-item" onclick="goTo('entry')">
+    <div class="icon">🥛</div><div class="label" id="navEntry">Entry</div>
+  </button>
+  <button class="bnav-item" onclick="goTo('clients')">
+    <div class="icon">👥</div><div class="label" id="navDispatch">Dispatch</div>
+  </button>
+  <button class="bnav-item" onclick="goTo('billing')">
+    <div class="icon">🧾</div><div class="label" id="navBills">Bills</div>
+  </button>
+  <button class="bnav-item" onclick="goTo('ai')">
+    <div class="icon">🤖</div><div class="label" id="navAI">AI</div>
+  </button>
+  <button class="bnav-item" onclick="goTo('setup')">
+    <div class="icon">⚙️</div><div class="label" id="navSetup">Setup</div>
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================
+//  LANGUAGE SUPPORT
+// ============================
+let currentLang = 'en';
+
+const translations = {
+  en: {
+    appSubtitle: 'Milk Management System',
+    homeTitle: "Today's Summary",
+    homeTotalLabel: 'Total milk today',
+    homeSessionsLabel: 'Sessions recorded',
+    homeCowLabel: 'Cow milk',
+    homeBuffaloLabel: 'Buffalo milk',
+    morningTitle: '🌅 Morning session',
+    eveningTitle: '🌇 Evening session',
+    noMorningText: 'No entries yet',
+    noEveningText: 'No entries yet',
+    recordMilkBtn: '➕ Record Milk Session',
+    recordTitle: 'Record Milk Session',
+    dateLabel: 'Date',
+    personLabel: 'Feeding Person',
+    selectPersonOption: '-- Select person --',
+    cowTitle: '🐄 Cow milk entries',
+    buffaloTitle: '🐃 Buffalo milk entries',
+    addCowBtn: '+ Add cow',
+    addBuffaloBtn: '+ Add buffalo',
+    saveSessionBtn: '✅ Save Session',
+    dispatchTitle: 'Client Dispatch',
+    recordDispatchTitle: '📋 Record today\'s dispatch',
+    dispatchDateLabel: 'Date',
+    saveDispatchBtn: '✅ Save Dispatch',
+    clientListTitle: '👥 Client list',
+    addClientBtn: '+ Add new client',
+    addClientFormTitle: 'Add Client',
+    clientNameLabel: 'Name',
+    clientPhoneLabel: 'Phone',
+    milkTypeLabel: 'Milk type',
+    dailyQtyLabel: 'Daily qty (L)',
+    submitClientBtn: 'Add Client',
+    billingTitle: 'Monthly Billing',
+    generateBillTitle: '📅 Generate Bill',
+    selectClientLabel: 'Client',
+    allClientsOption: 'All clients',
+    monthLabel: 'Month',
+    generateBillBtn: '🧾 Generate Bill',
+    fatRateTitle: '⚙️ Fat Rate Config',
+    milkTypeCol: 'Milk type',
+    fatPercentCol: 'Fat %',
+    rateCol: 'Rate (₹/L)',
+    addRateBtn: '+ Add rate',
+    aiTitle: '🤖 AI Assistant',
+    setupTitle: 'Setup',
+    animalsTitle: '🐄 Animals',
+    personsTitle: '👤 Feeding Persons',
+    apiTitle: '🔑 AI API Key (OpenRouter)',
+    apiHelpText: 'Enter your OpenRouter API key for free AI access (get at openrouter.ai)',
+    saveApiBtn: 'Save API Key',
+    googleSheetsTitle: '📊 Google Sheets Setup',
+    sheetsHelpText: 'Connect to Google Sheets for cloud backup & multi-device sync',
+    connectSheetsBtn: '🔗 Connect Google Sheets',
+    dataTitle: '⚠️ Data',
+    exportBtn: '📤 Export data (JSON)',
+    sampleBtn: '🎯 Load sample data',
+    syncBtn: '🔄 Sync to Google Sheets',
+    resetBtn: '⚠️ Reset All Data',
+    navHome: 'Home',
+    navEntry: 'Entry',
+    navDispatch: 'Dispatch',
+    navBills: 'Bills',
+    navAI: 'AI',
+    navSetup: 'Setup',
+    shareViaWhatsApp: '📱 Share Bill via WhatsApp',
+    copyToClipboard: '📋 Copy Bill',
+    fyManageTitle: 'Fiscal Year Management',
+    fyCurrentLabel: 'Current FY',
+    fyStartLabel: 'Started',
+    fySessionsLabel: 'Sessions this FY',
+    fyDispatchesLabel: 'Dispatches this FY',
+    fyArchiveBtn: '📦 Archive & Start New FY',
+    fyViewBtn: '📜 View Archived Data',
+    fyAutoCheckLabel: 'Auto-check on app start',
+    fyAutoOn: 'On',
+    fyAutoOff: 'Off',
+    archiveConfirm: 'This will archive current year data and start new fiscal year. Continue?',
+    archiveSuccess: 'Fiscal year archived successfully! New FY started.',
+    archiveWarning: '⚠️ New fiscal year detected! Archive your data to start fresh.',
+    resetConfirm: '⚠️ This will delete ALL data! Are you sure?',
+    resetSuccess: 'All data has been reset.'
+  },
+  hi: {
+    appSubtitle: 'दुग्ध प्रबंधन प्रणाली',
+    homeTitle: 'आज का सारांश',
+    homeTotalLabel: 'आज का कुल दूध',
+    homeSessionsLabel: 'सत्र दर्ज',
+    homeCowLabel: 'गाय का दूध',
+    homeBuffaloLabel: 'भैंस का दूध',
+    morningTitle: '🌅 सुबह का सत्र',
+    eveningTitle: '🌇 शाम का सत्र',
+    noMorningText: 'कोई प्रविष्टि नहीं',
+    noEveningText: 'कोई प्रविष्टि नहीं',
+    recordMilkBtn: '➕ दूध सत्र दर्ज करें',
+    recordTitle: 'दूध सत्र दर्ज करें',
+    dateLabel: 'तारीख',
+    personLabel: 'दूध देने वाला व्यक्ति',
+    selectPersonOption: '-- व्यक्ति चुनें --',
+    cowTitle: '🐄 गाय का दूध प्रविष्टियाँ',
+    buffaloTitle: '🐃 भैंस का दूध प्रविष्टियाँ',
+    addCowBtn: '+ गाय जोड़ें',
+    addBuffaloBtn: '+ भैंस जोड़ें',
+    saveSessionBtn: '✅ सत्र सहेजें',
+    dispatchTitle: 'ग्राहक वितरण',
+    recordDispatchTitle: '📋 आज का वितरण दर्ज करें',
+    dispatchDateLabel: 'तारीख',
+    saveDispatchBtn: '✅ वितरण सहेजें',
+    clientListTitle: '👥 ग्राहक सूची',
+    addClientBtn: '+ नया ग्राहक जोड़ें',
+    addClientFormTitle: 'ग्राहक जोड़ें',
+    clientNameLabel: 'नाम',
+    clientPhoneLabel: 'फोन',
+    milkTypeLabel: 'दूध प्रकार',
+    dailyQtyLabel: 'दैनिक मात्रा (लीटर)',
+    submitClientBtn: 'ग्राहक जोड़ें',
+    billingTitle: 'मासिक बिलिंग',
+    generateBillTitle: '📅 बिल बनाएं',
+    selectClientLabel: 'ग्राहक',
+    allClientsOption: 'सभी ग्राहक',
+    monthLabel: 'माह',
+    generateBillBtn: '🧾 बिल बनाएं',
+    fatRateTitle: '⚙️ वसा दर कॉन्फ़िग',
+    milkTypeCol: 'दूध प्रकार',
+    fatPercentCol: 'वसा %',
+    rateCol: 'दर (₹/लीटर)',
+    addRateBtn: '+ दर जोड़ें',
+    aiTitle: '🤖 एआई सहायक',
+    setupTitle: 'सेटअप',
+    animalsTitle: '🐄 पशु',
+    personsTitle: '👤 दूध देने वाले व्यक्ति',
+    apiTitle: '🔑 एआई एपीआई कुंजी (ओपनराउटर)',
+    apiHelpText: 'मुफ्त एआई एक्सेस के लिए अपनी ओपनराउटर एपीआई कुंजी दर्ज करें (openrouter.ai पर प्राप्त करें)',
+    saveApiBtn: 'एपीआई कुंजी सहेजें',
+    googleSheetsTitle: '📊 गूगल शीट्स सेटअप',
+    sheetsHelpText: 'क्लाउड बैकअप और मल्टी-डिवाइस सिंक के लिए गूगल शीट्स से कनेक्ट करें',
+    connectSheetsBtn: '🔗 गूगल शीट्स कनेक्ट करें',
+    dataTitle: '⚠️ डेटा',
+    exportBtn: '📤 डेटा निर्यात करें (JSON)',
+    sampleBtn: '🎯 नमूना डेटा लोड करें',
+    syncBtn: '🔄 गूगल शीट्स से सिंक करें',
+    resetBtn: '⚠️ सभी डेटा रीसेट करें',
+    navHome: 'होम',
+    navEntry: 'प्रविष्टि',
+    navDispatch: 'वितरण',
+    navBills: 'बिल',
+    navAI: 'एआई',
+    navSetup: 'सेटअप',
+    shareViaWhatsApp: '📱 व्हाट्सएप पर बिल शेयर करें',
+    copyToClipboard: '📋 बिल कॉपी करें',
+    fyManageTitle: 'वित्तीय वर्ष प्रबंधन',
+    fyCurrentLabel: 'वर्तमान वित्तीय वर्ष',
+    fyStartLabel: 'प्रारंभ',
+    fySessionsLabel: 'इस वित्तीय वर्ष में सत्र',
+    fyDispatchesLabel: 'इस वित्तीय वर्ष में डिस्पैच',
+    fyArchiveBtn: '📦 आर्काइव करें और नया वित्तीय वर्ष शुरू करें',
+    fyViewBtn: '📜 संग्रहीत डेटा देखें',
+    fyAutoCheckLabel: 'ऐप शुरू होने पर स्वचालित जांच',
+    fyAutoOn: 'चालू',
+    fyAutoOff: 'बंद',
+    archiveConfirm: 'यह वर्तमान वर्ष का डेटा संग्रहीत करेगा और नया वित्तीय वर्ष शुरू करेगा। जारी रखें?',
+    archiveSuccess: 'वित्तीय वर्ष सफलतापूर्वक संग्रहीत! नया वित्तीय वर्ष शुरू हुआ।',
+    archiveWarning: '⚠️ नया वित्तीय वर्ष शुरू हो गया है! फ्रेश शुरू करने के लिए अपना डेटा संग्रहीत करें।',
+    resetConfirm: '⚠️ यह सभी डेटा हटा देगा! क्या आप निश्चित हैं?',
+    resetSuccess: 'सभी डेटा रीसेट कर दिया गया है।'
+  }
+};
+
+function setLanguage(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+  if(event && event.target) event.target.classList.add('active');
+  else document.querySelector('.lang-btn').classList.add('active');
+  
+  Object.keys(translations[lang]).forEach(key => {
+    const el = document.getElementById(key);
+    if (el) el.textContent = translations[lang][key];
+  });
+  
+  if (lang === 'hi') {
+    document.getElementById('chat-input').placeholder = 'अपने डेयरी के बारे में कुछ भी पूछें...';
+    document.getElementById('an-name').placeholder = 'पशु का नाम (जैसे गंगा)';
+    document.getElementById('ps-name').placeholder = 'व्यक्ति का नाम';
+    document.getElementById('cl-name').placeholder = 'ग्राहक का नाम';
+    document.getElementById('cl-phone').placeholder = 'मोबाइल नंबर';
+  } else {
+    document.getElementById('chat-input').placeholder = 'Ask anything about your dairy...';
+    document.getElementById('an-name').placeholder = 'Animal name (e.g. Ganga)';
+    document.getElementById('ps-name').placeholder = 'Person name';
+    document.getElementById('cl-name').placeholder = 'Client name';
+    document.getElementById('cl-phone').placeholder = 'Mobile number';
+  }
+  updateFiscalYearDisplay();
+}
+
+// ============================
+//  DATABASE (localStorage)
+// ============================
+let googleSheetsUrl = localStorage.getItem('google_sheets_url') || '';
+
+const DB = {
+  get: k => { try { return JSON.parse(localStorage.getItem('dairy_'+k)) || []; } catch(e){ return []; } },
+  set: (k,v) => localStorage.setItem('dairy_'+k, JSON.stringify(v)),
+  getObj: k => { try { return JSON.parse(localStorage.getItem('dairy_'+k)) || {}; } catch(e){ return {}; } },
+  setObj: (k,v) => localStorage.setItem('dairy_'+k, JSON.stringify(v)),
+  remove: k => localStorage.removeItem('dairy_'+k)
+};
+
+const getAnimals = () => DB.get('animals');
+const getPersons = () => DB.get('persons');
+const getClients = () => DB.get('clients');
+const getSessions = () => DB.get('sessions');
+const getDispatches = () => DB.get('dispatches');
+const getFatRates = () => DB.get('fat_rates');
+const getApiKey = () => localStorage.getItem('openrouter_api_key') || '';
+const getAutoFyCheck = () => localStorage.getItem('auto_fy_check') !== 'false';
+
+const saveAnimals = v => DB.set('animals', v);
+const savePersons = v => DB.set('persons', v);
+const saveClients = v => DB.set('clients', v);
+const saveSessions = v => DB.set('sessions', v);
+const saveDispatches = v => DB.set('dispatches', v);
+const saveFatRates = v => DB.set('fat_rates', v);
+
+function setAutoFyCheck(enabled) {
+  localStorage.setItem('auto_fy_check', enabled);
+  toast(currentLang === 'hi' ? (enabled ? '✅ स्वचालित जांच चालू' : '❌ स्वचालित जांच बंद') : (enabled ? '✅ Auto-check ON' : '❌ Auto-check OFF'));
+}
+
+function saveSheetsUrl() {
+  const url = document.getElementById('sheets-script-url').value.trim();
+  if(url) {
+    localStorage.setItem('google_sheets_url', url);
+    googleSheetsUrl = url;
+    document.getElementById('sheets-status').innerHTML = '✅ ' + (currentLang === 'hi' ? 'यूआरएल सहेजा गया' : 'URL saved');
+    toast(currentLang === 'hi' ? 'गूगल शीट्स यूआरएल सहेजा गया' : 'Google Sheets URL saved');
+  }
+}
+
+async function syncToSheets() {
+  if(!googleSheetsUrl) {
+    toast(currentLang === 'hi' ? 'पहले गूगल शीट्स यूआरएल सेट करें' : 'First set Google Sheets URL');
+    return;
+  }
+  const data = {
+    animals: getAnimals(), persons: getPersons(), clients: getClients(),
+    sessions: getSessions(), dispatches: getDispatches(), fat_rates: getFatRates(),
+    timestamp: new Date().toISOString()
+  };
+  try {
+    await fetch(googleSheetsUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    toast(currentLang === 'hi' ? '✅ डेटा सिंक शुरू किया गया' : '✅ Data sync initiated');
+  } catch(e) {
+    toast(currentLang === 'hi' ? '❌ सिंक विफल: ' + e.message : '❌ Sync failed: ' + e.message);
+  }
+}
+
+// ============================
+//  FISCAL YEAR MANAGEMENT
+// ============================
+function getCurrentFiscalYear() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1;
+  const isAprilOrLater = month >= 4;
+  return isAprilOrLater ? `${year}-${(year+1).toString().slice(-2)}` : `${year-1}-${year.toString().slice(-2)}`;
+}
+
+function getFiscalYearStartDate(fy) {
+  const startYear = parseInt(fy.split('-')[0]);
+  return `${startYear}-04-01`;
+}
+
+function updateFiscalYearDisplay() {
+  const currentFy = getCurrentFiscalYear();
+  const savedFy = localStorage.getItem('current_fiscal_year') || currentFy;
+  document.getElementById('displayCurrentFy').textContent = savedFy;
+  document.getElementById('currentFyBadge').textContent = savedFy;
+  document.getElementById('fyBadge').textContent = savedFy;
+  document.getElementById('displayFyStart').textContent = getFiscalYearStartDate(savedFy);
+  
+  const sessions = getSessions();
+  const dispatches = getDispatches();
+  const fyStart = getFiscalYearStartDate(savedFy);
+  const sessionsThisFy = sessions.filter(s => s.date >= fyStart).length;
+  const dispatchesThisFy = dispatches.filter(d => d.date >= fyStart).length;
+  document.getElementById('fySessionsCount').textContent = sessionsThisFy;
+  document.getElementById('fyDispatchesCount').textContent = dispatchesThisFy;
+  
+  if (savedFy !== currentFy && getAutoFyCheck()) {
+    document.getElementById('fyWarningBox').style.display = 'block';
+    document.getElementById('fyWarningBox').innerHTML = translations[currentLang].archiveWarning;
+  } else {
+    document.getElementById('fyWarningBox').style.display = 'none';
+  }
+}
+
+function archiveCurrentData() {
+  if(!confirm(translations[currentLang].archiveConfirm)) return;
+  
+  const currentFy = getCurrentFiscalYear();
+  const oldFy = localStorage.getItem('current_fiscal_year') || currentFy;
+  
+  // Archive current data
+  const archiveKey = 'dairy_archive_' + oldFy;
+  const archiveData = {
+    animals: getAnimals(),
+    persons: getPersons(),
+    clients: getClients(),
+    sessions: getSessions(),
+    dispatches: getDispatches(),
+    fat_rates: getFatRates(),
+    archived_date: new Date().toISOString()
+  };
+  localStorage.setItem(archiveKey, JSON.stringify(archiveData));
+  
+  // Clear current data but keep masters
+  const animals = getAnimals();
+  const persons = getPersons();
+  const clients = getClients();
+  const fatRates = getFatRates();
+  
+  saveSessions([]);
+  saveDispatches([]);
+  
+  // Save masters back
+  saveAnimals(animals);
+  savePersons(persons);
+  saveClients(clients);
+  saveFatRates(fatRates);
+  
+  // Update fiscal year
+  localStorage.setItem('current_fiscal_year', currentFy);
+  localStorage.setItem('last_archive_date', new Date().toISOString());
+  
+  toast(translations[currentLang].archiveSuccess);
+  updateFiscalYearDisplay();
+  renderHome();
+}
+
+function viewArchivedData() {
+  const archives = [];
+  for(let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if(key && key.startsWith('dairy_archive_')) {
+      archives.push(key.replace('dairy_archive_', ''));
+    }
+  }
+  if(archives.length === 0) {
+    toast(currentLang === 'hi' ? 'कोई संग्रहीत डेटा नहीं मिला' : 'No archived data found');
+    return;
+  }
+  let msg = currentLang === 'hi' ? '📦 संग्रहीत वित्तीय वर्ष:\n' : '📦 Archived fiscal years:\n';
+  archives.forEach(fy => { msg += `• ${fy}\n`; });
+  msg += '\n' + (currentLang === 'hi' ? 'डेटा देखने के लिए कंसोल लॉग देखें' : 'Check console log to view data');
+  alert(msg);
+  console.log('Archived data:', archives.map(fy => ({ fy, data: JSON.parse(localStorage.getItem('dairy_archive_'+fy)) })));
+}
+
+function showFiscalYearDialog() {
+  archiveCurrentData();
+}
+
+function resetAllData() {
+  if(!confirm(translations[currentLang].resetConfirm)) return;
+  const keysToKeep = ['openrouter_api_key', 'google_sheets_url', 'current_fiscal_year', 'auto_fy_check'];
+  const keysToRemove = [];
+  for(let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if(key && key.startsWith('dairy_') && !keysToKeep.includes(key)) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+  toast(translations[currentLang].resetSuccess);
+  setTimeout(() => location.reload(), 1000);
+}
+
+// ============================
+//  NAVIGATION & UI
+// ============================
+let currentScreen = 'home';
+let currentSession = 'morning';
+let currentDispatchSession = 'morning';
+
+function goTo(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  const idx = ['home','entry','clients','billing','ai','setup'].indexOf(name);
+  document.querySelectorAll('.bnav-item')[idx].classList.add('active');
+  currentScreen = name;
+
+  if(name==='home') renderHome();
+  if(name==='entry') renderEntryScreen();
+  if(name==='clients') renderClientsScreen();
+  if(name==='billing') renderBillingScreen();
+  if(name==='setup') { renderSetupScreen(); updateFiscalYearDisplay(); }
+}
+
+function today() {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+}
+
+function fmtDate(d) {
+  if(!d) return '';
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+}
+
+function fmtMoney(n) {
+  return '₹' + parseFloat(n||0).toFixed(2);
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function nowTime() {
+  return new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+}
+
+// ============================
+//  WHATSAPP SHARE
+// ============================
+function shareBillViaWhatsApp(billText, clientName) {
+  const encodedText = encodeURIComponent(billText);
+  const phone = prompt(currentLang === 'hi' ? 'व्हाट्सएप पर भेजने के लिए फोन नंबर दर्ज करें (वैकल्पिक):' : 'Enter phone number to send via WhatsApp (optional):');
+  let url = `https://wa.me/?text=${encodedText}`;
+  if(phone && phone.trim()) {
+    let cleanPhone = phone.replace(/[^0-9]/g, '');
+    if(cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
+    if(!cleanPhone.startsWith('91') && cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+    url = `https://wa.me/${cleanPhone}?text=${encodedText}`;
+  }
+  window.open(url, '_blank');
+}
+
+function copyBillToClipboard(billText) {
+  navigator.clipboard.writeText(billText);
+  toast(currentLang === 'hi' ? '📋 बिल कॉपी हो गया!' : '📋 Bill copied!');
+}
+
+// ============================
+//  HOME SCREEN
+// ============================
+function renderHome() {
+  const td = today();
+  const sessions = getSessions().filter(s => s.date === td);
+  const total = sessions.reduce((a,s) => a + (parseFloat(s.qty)||0), 0);
+  const cowTotal = sessions.filter(s=>s.animal_type==='cow').reduce((a,s) => a+(parseFloat(s.qty)||0), 0);
+  const bufTotal = sessions.filter(s=>s.animal_type==='buffalo').reduce((a,s) => a+(parseFloat(s.qty)||0), 0);
+
+  document.getElementById('home-total-litres').textContent = total.toFixed(1)+' L';
+  document.getElementById('home-sessions').textContent = sessions.length;
+  document.getElementById('home-cow-litres').textContent = cowTotal.toFixed(1)+' L';
+  document.getElementById('home-buffalo-litres').textContent = bufTotal.toFixed(1)+' L';
+
+  const morning = sessions.filter(s=>s.session==='morning');
+  const evening = sessions.filter(s=>s.session==='evening');
+
+  function renderList(arr, elId) {
+    const el = document.getElementById(elId);
+    if(!arr.length) { 
+      const noText = currentLang === 'hi' ? 'कोई प्रविष्टि नहीं' : 'No entries yet';
+      el.innerHTML = `<div style="font-size:13px;color:var(--text-soft)">${noText}</div>`; 
+      return; 
+    }
+    const animals = getAnimals();
+    el.innerHTML = arr.map(s => {
+      const an = animals.find(a=>a.id===s.animal_id);
+      return `<div class="list-item" style="padding:8px 10px">
+        <div class="list-item-left">
+          <div class="list-item-name">${an ? an.name : 'Unknown'} <span class="badge badge-${s.animal_type}">${s.animal_type === 'cow' ? (currentLang === 'hi' ? 'गाय' : 'cow') : (currentLang === 'hi' ? 'भैंस' : 'buffalo')}</span></div>
+          <div class="list-item-sub">${currentLang === 'hi' ? 'वसा' : 'Fat'}: ${s.fat||'—'}% · ${s.person||'—'}</div>
+        </div>
+        <div class="list-item-right">${parseFloat(s.qty).toFixed(1)} L</div>
+      </div>`;
+    }).join('');
+  }
+  renderList(morning, 'home-morning-list');
+  renderList(evening, 'home-evening-list');
+}
+
+// ============================
+//  ENTRY SCREEN
+// ============================
+function renderEntryScreen() {
+  document.getElementById('entry-date').value = today();
+  const persons = getPersons();
+  const sel = document.getElementById('entry-person');
+  const selectText = currentLang === 'hi' ? '-- व्यक्ति चुनें --' : '-- Select person --';
+  sel.innerHTML = `<option value="">${selectText}</option>` + persons.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  renderAnimalRows();
+}
+
+function setSession(s) {
+  currentSession = s;
+  document.getElementById('btn-morning').classList.toggle('active', s==='morning');
+  document.getElementById('btn-evening').classList.toggle('active', s==='evening');
+}
+
+function renderAnimalRows() {
+  const animals = getAnimals();
+  const cows = animals.filter(a=>a.type==='cow');
+  const buffaloes = animals.filter(a=>a.type==='buffalo');
+  renderRows(cows, 'cow-entries', 'cow');
+  renderRows(buffaloes, 'buffalo-entries', 'buffalo');
+}
+
+let extraCows = [], extraBufs = [];
+
+function renderRows(animals, containerId, type) {
+  const extras = type==='cow' ? extraCows : extraBufs;
+  const allAnimals = [...animals, ...extras];
+  const container = document.getElementById(containerId);
+  if(!allAnimals.length) {
+    const noText = currentLang === 'hi' ? 'अभी तक कोई ' + (type==='cow' ? 'गाय' : 'भैंस') + ' नहीं जोड़ी गई। सेटअप पर जाएं।' : 'No '+type+' added yet. Go to Setup.';
+    container.innerHTML = `<div style="font-size:12px;color:var(--text-soft);padding:4px 0">${noText}</div>`;
+    return;
+  }
+  container.innerHTML = allAnimals.map((a,i) => `
+    <div class="form-grid" style="margin-bottom:8px;align-items:center">
+      <div style="font-size:13px;font-weight:600">${a.name}</div>
+      <div style="display:flex;gap:6px">
+        <input type="number" class="form-input" id="qty-${type}-${a.id}" placeholder="${currentLang === 'hi' ? 'लीटर' : 'Litres'}" step="0.1" style="flex:1">
+        <input type="number" class="form-input" id="fat-${type}-${a.id}" placeholder="${currentLang === 'hi' ? 'वसा%' : 'Fat%'}" step="0.1" style="flex:1">
+      </div>
+    </div>`).join('');
+}
+
+function addAnimalRow(type) {
+  const name = prompt(currentLang === 'hi' ? 'पशु का नाम दर्ज करें:' : 'Enter animal name:');
+  if(!name) return;
+  const id = 'tmp_'+genId();
+  if(type==='cow') extraCows.push({id,name,type:'cow'});
+  else extraBufs.push({id,name,type:'buffalo'});
+  renderAnimalRows();
+}
+
+function saveSession() {
+  const date = document.getElementById('entry-date').value;
+  const personId = document.getElementById('entry-person').value;
+  const persons = getPersons();
+  const person = persons.find(p=>p.id===personId);
+  if(!date) { toast(currentLang === 'hi' ? 'कृपया तारीख चुनें' : 'Please select date'); return; }
+
+  const animals = getAnimals();
+  const cows = animals.filter(a=>a.type==='cow');
+  const buffaloes = animals.filter(a=>a.type==='buffalo');
+  const allCows = [...cows, ...extraCows];
+  const allBufs = [...buffaloes, ...extraBufs];
+
+  let entries = [];
+  [...allCows.map(a=>({...a,animal_type:'cow'})), ...allBufs.map(a=>({...a,animal_type:'buffalo'}))].forEach(a => {
+    const qtyEl = document.getElementById('qty-'+a.animal_type+'-'+a.id);
+    const fatEl = document.getElementById('fat-'+a.animal_type+'-'+a.id);
+    const qty = parseFloat(qtyEl?.value || 0);
+    if(qty > 0) {
+      entries.push({
+        id: genId(),
+        date,
+        session: currentSession,
+        animal_id: a.id,
+        animal_name: a.name,
+        animal_type: a.animal_type,
+        qty,
+        fat: parseFloat(fatEl?.value || 0),
+        person_id: personId,
+        person: person?.name || ''
+      });
+    }
+  });
+
+  if(!entries.length) { toast(currentLang === 'hi' ? 'कम से कम एक मात्रा > 0 दर्ज करें' : 'Enter at least one qty > 0'); return; }
+
+  const sessions = getSessions();
+  saveSessions([...sessions, ...entries]);
+  extraCows = []; extraBufs = [];
+  toast(currentLang === 'hi' ? '✅ सत्र सहेजा गया! ' + entries.length + ' प्रविष्टियाँ' : '✅ Session saved! '+entries.length+' entries');
+  renderEntryScreen();
+  syncToSheets();
+}
+
+// ============================
+//  CLIENTS & DISPATCH (abbreviated - similar to before)
+// ============================
+function renderClientsScreen() {
+  document.getElementById('dispatch-date').value = today();
+  renderDispatchRows();
+  renderClientList();
+}
+
+function setDispatchSession(s) {
+  currentDispatchSession = s;
+  document.getElementById('btn-d-morning').classList.toggle('active', s==='morning');
+  document.getElementById('btn-d-evening').classList.toggle('active', s==='evening');
+}
+
+function renderDispatchRows() {
+  const clients = getClients();
+  const container = document.getElementById('dispatch-client-rows');
+  if(!clients.length) {
+    const noText = currentLang === 'hi' ? 'अभी तक कोई ग्राहक नहीं जोड़ा गया' : 'No clients added yet';
+    container.innerHTML = `<div style="font-size:13px;color:var(--text-soft);padding:4px 0">${noText}</div>`;
+    return;
+  }
+  container.innerHTML = clients.map(c => `
+    <div style="margin-bottom:10px">
+      <div class="form-label">${c.name} <span class="badge badge-${c.milk_type}">${c.milk_type === 'cow' ? (currentLang === 'hi' ? 'गाय' : 'cow') : (currentLang === 'hi' ? 'भैंस' : 'buffalo')}</span> (${currentLang === 'hi' ? 'नियमित' : 'usual'}: ${c.daily_qty} L)</div>
+      <div class="form-grid">
+        <input type="number" class="form-input" id="d-qty-${c.id}" placeholder="${currentLang === 'hi' ? 'मात्रा (लीटर)' : 'Qty (L)'}" step="0.1" value="${c.daily_qty}">
+        <input type="number" class="form-input" id="d-fat-${c.id}" placeholder="${currentLang === 'hi' ? 'वसा %' : 'Fat %'}" step="0.1">
+      </div>
+    </div>`).join('');
+}
+
+function saveDispatch() {
+  const date = document.getElementById('dispatch-date').value;
+  if(!date) { toast(currentLang === 'hi' ? 'तारीख चुनें' : 'Select date'); return; }
+  const clients = getClients();
+  let entries = [];
+  clients.forEach(c => {
+    const qty = parseFloat(document.getElementById('d-qty-'+c.id)?.value || 0);
+    const fat = parseFloat(document.getElementById('d-fat-'+c.id)?.value || 0);
+    if(qty > 0) {
+      const rate = getRate(c.milk_type, fat);
+      entries.push({ id: genId(), date, session: currentDispatchSession, client_id: c.id, client_name: c.name, milk_type: c.milk_type, qty, fat, rate_per_litre: rate });
+    }
+  });
+  if(!entries.length) { toast(currentLang === 'hi' ? 'कम से कम एक मात्रा दर्ज करें' : 'Enter at least one qty'); return; }
+  saveDispatches([...getDispatches(), ...entries]);
+  toast(currentLang === 'hi' ? '✅ वितरण सहेजा गया! ' + entries.length + ' प्रविष्टियाँ' : '✅ Dispatch saved! '+entries.length+' entries');
+  syncToSheets();
+}
+
+function getRate(milkType, fat) {
+  const rates = getFatRates().filter(r => r.milk_type === milkType).sort((a,b) => parseFloat(a.fat) - parseFloat(b.fat));
+  if(!rates.length) return 0;
+  for(let r of rates) { if(fat <= parseFloat(r.fat)) return parseFloat(r.rate); }
+  return parseFloat(rates[rates.length-1].rate);
+}
+
+function renderClientList() {
+  const clients = getClients();
+  const el = document.getElementById('client-list-display');
+  if(!clients.length) { 
+    const noText = currentLang === 'hi' ? 'अभी तक कोई ग्राहक नहीं' : 'No clients yet';
+    el.innerHTML = `<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">${noText}</div>`; 
+    return; 
+  }
+  el.innerHTML = clients.map(c => `
+    <div class="list-item">
+      <div class="list-item-left">
+        <div class="list-item-name">${c.name}</div>
+        <div class="list-item-sub">${c.phone||'—'} · ${c.daily_qty} L/day · <span class="badge badge-${c.milk_type}">${c.milk_type === 'cow' ? (currentLang === 'hi' ? 'गाय' : 'cow') : (currentLang === 'hi' ? 'भैंस' : 'buffalo')}</span></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="deleteClient('${c.id}')">✕</button>
+    </div>`).join('');
+}
+
+function showAddClient() {
+  const f = document.getElementById('add-client-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function addClient() {
+  const name = document.getElementById('cl-name').value.trim();
+  const phone = document.getElementById('cl-phone').value.trim();
+  const type = document.getElementById('cl-type').value;
+  const qty = parseFloat(document.getElementById('cl-qty').value);
+  if(!name || !qty) { toast(currentLang === 'hi' ? 'नाम और मात्रा दर्ज करें' : 'Enter name and quantity'); return; }
+  const clients = getClients();
+  clients.push({ id: genId(), name, phone, milk_type: type, daily_qty: qty });
+  saveClients(clients);
+  document.getElementById('cl-name').value = ''; document.getElementById('cl-phone').value = ''; document.getElementById('cl-qty').value = '';
+  document.getElementById('add-client-form').style.display = 'none';
+  toast(currentLang === 'hi' ? 'ग्राहक जोड़ा गया' : 'Client added');
+  renderClientsScreen();
+  syncToSheets();
+}
+
+function deleteClient(id) {
+  if(!confirm(currentLang === 'hi' ? 'इस ग्राहक को हटाएं?' : 'Remove this client?')) return;
+  saveClients(getClients().filter(c=>c.id!==id));
+  renderClientsScreen();
+  syncToSheets();
+}
+
+// ============================
+//  BILLING & FAT RATES
+// ============================
+function renderBillingScreen() {
+  const now = new Date();
+  document.getElementById('bill-month').value = now.toISOString().slice(0,7);
+  const clients = getClients();
+  const sel = document.getElementById('bill-client');
+  const allText = currentLang === 'hi' ? 'सभी ग्राहक' : 'All clients';
+  sel.innerHTML = `<option value="">${allText}</option>` + clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  renderFatRates();
+}
+
+function renderFatRates() {
+  const rates = getFatRates();
+  document.getElementById('fat-rate-body').innerHTML = rates.map(r => `
+    <tr>
+      <td><span class="badge badge-${r.milk_type}">${r.milk_type === 'cow' ? (currentLang === 'hi' ? 'गाय' : 'cow') : (currentLang === 'hi' ? 'भैंस' : 'buffalo')}</span></td>
+      <td>${r.fat}%</td>
+      <td>₹${r.rate}/L</td>
+      <td><button class="btn btn-outline btn-sm" onclick="deleteFatRate('${r.id}')">✕</button></td>
+    </tr>`).join('') || `<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:8px 6px">${currentLang === 'hi' ? 'कोई दर कॉन्फ़िग नहीं' : 'No rates configured'}</td></tr>`;
+}
+
+function addFatRate() {
+  const type = document.getElementById('fr-type').value;
+  const fat = document.getElementById('fr-fat').value;
+  const rate = document.getElementById('fr-rate').value;
+  if(!fat||!rate) { toast(currentLang === 'hi' ? 'वसा% और दर दर्ज करें' : 'Enter fat% and rate'); return; }
+  const rates = getFatRates();
+  rates.push({id:genId(), milk_type:type, fat:parseFloat(fat), rate:parseFloat(rate)});
+  saveFatRates(rates.sort((a,b)=>a.fat-b.fat));
+  document.getElementById('fr-fat').value=''; document.getElementById('fr-rate').value='';
+  renderFatRates();
+  toast(currentLang === 'hi' ? 'दर जोड़ी गई' : 'Rate added');
+  syncToSheets();
+}
+
+function deleteFatRate(id) {
+  saveFatRates(getFatRates().filter(r=>r.id!==id));
+  renderFatRates();
+  syncToSheets();
+}
+
+function generateBill() {
+  const month = document.getElementById('bill-month').value;
+  const clientId = document.getElementById('bill-client').value;
+  if(!month) { toast(currentLang === 'hi' ? 'माह चुनें' : 'Select month'); return; }
+
+  const dispatches = getDispatches().filter(d => d.date.startsWith(month));
+  const clients = getClients();
+
+  let targetClients = clientId ? clients.filter(c=>c.id===clientId) : clients;
+  if(!targetClients.length) { toast(currentLang === 'hi' ? 'कोई ग्राहक नहीं मिला' : 'No clients found'); return; }
+
+  let html = '';
+  targetClients.forEach(c => {
+    const cDispatches = dispatches.filter(d=>d.client_id===c.id);
+    if(!cDispatches.length) return;
+    const total = cDispatches.reduce((a,d) => a + (parseFloat(d.qty)||0) * (parseFloat(d.rate_per_litre)||0), 0);
+    const totalQty = cDispatches.reduce((a,d) => a+(parseFloat(d.qty)||0), 0);
+    const monthDisplay = month;
+    
+    let billText = `📄 DAIRYBOOK BILL\n\nClient: ${c.name}\nMonth: ${monthDisplay}\n\nDate | Qty(L) | Fat% | Rate | Amount\n`;
+    let billHtml = `<div class="card">
+      <div class="card-title">🧾 ${c.name} — ${monthDisplay}</div>
+      <table class="mini-table">
+        <thead><tr><th>${currentLang === 'hi' ? 'तारीख' : 'Date'}</th><th>${currentLang === 'hi' ? 'मात्रा' : 'Qty'}</th><th>${currentLang === 'hi' ? 'वसा%' : 'Fat%'}</th><th>${currentLang === 'hi' ? 'दर' : 'Rate'}</th><th>${currentLang === 'hi' ? 'राशि' : 'Amt'}</th></thead>
+        <tbody>`;
+    
+    cDispatches.forEach(d => {
+      const amt = (parseFloat(d.qty)*parseFloat(d.rate_per_litre||0)).toFixed(0);
+      billHtml += `<tr><td>${d.date.slice(5)}</td><td>${parseFloat(d.qty).toFixed(1)}L</td><td>${d.fat||'—'}%</td><td>₹${d.rate_per_litre||0}</td><td>₹${amt}</td></tr>`;
+      billText += `${d.date.slice(5)} | ${parseFloat(d.qty).toFixed(1)} | ${d.fat||'—'} | ₹${d.rate_per_litre||0} | ₹${amt}\n`;
+    });
+    
+    billHtml += `</tbody></table><div class="divider"></div>
+      <div class="bill-row"><span>${currentLang === 'hi' ? 'कुल मात्रा' : 'Total qty'}</span><span>${totalQty.toFixed(1)} L</span></div>
+      <div class="bill-row"><span class="bill-total" style="font-weight:700">${currentLang === 'hi' ? 'कुल राशि' : 'Total amount'}</span><span class="bill-total" style="font-size:18px">${fmtMoney(total)}</span></div>
+      <div class="share-buttons">
+        <button class="btn btn-wa btn-sm" onclick="shareBillViaWhatsApp('${billText.replace(/'/g, "\\'")}', '${c.name}')">📱 ${currentLang === 'hi' ? 'व्हाट्सएप पर शेयर करें' : 'Share via WhatsApp'}</button>
+        <button class="btn btn-outline btn-sm" onclick="copyBillToClipboard('${billText.replace(/'/g, "\\'")}')">📋 ${currentLang === 'hi' ? 'कॉपी करें' : 'Copy'}</button>
+      </div>
+    </div>`;
+    html += billHtml;
+  });
+
+  document.getElementById('bill-output').innerHTML = html || `<div class="card"><div style="color:var(--text-soft);font-size:13px">${currentLang === 'hi' ? 'इस अवधि के लिए कोई डिस्पैच डेटा नहीं' : 'No dispatch data for this period'}</div></div>`;
+}
+
+// ============================
+//  SETUP SCREEN
+// ============================
+function renderSetupScreen() {
+  renderAnimalListSetup();
+  renderPersonListSetup();
+  const key = getApiKey();
+  if(key) {
+    document.getElementById('api-key-status').textContent = '✅ API key saved ('+key.slice(0,8)+'...)';
+    document.getElementById('api-key-input').value = key;
+  }
+  if(googleSheetsUrl) {
+    document.getElementById('sheets-script-url').value = googleSheetsUrl;
+    document.getElementById('sheets-status').innerHTML = '✅ ' + (currentLang === 'hi' ? 'कनेक्टेड' : 'Connected');
+  }
+  const autoCheck = getAutoFyCheck();
+  document.querySelector(`input[name="autoFyCheck"][value="${autoCheck ? 'on' : 'off'}"]`).checked = true;
+}
+
+function renderAnimalListSetup() {
+  const animals = getAnimals();
+  const el = document.getElementById('animal-list-display');
+  el.innerHTML = animals.map(a => `
+    <div class="list-item" style="margin-bottom:6px">
+      <div class="list-item-left">
+        <span class="list-item-name">${a.name}</span>
+        <span class="badge badge-${a.type==='cow'?'cow':'buffalo'}" style="margin-left:6px">${a.type === 'cow' ? (currentLang === 'hi' ? 'गाय' : 'cow') : (currentLang === 'hi' ? 'भैंस' : 'buffalo')}</span>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="deleteAnimal('${a.id}')">✕</button>
+    </div>`).join('') || `<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${currentLang === 'hi' ? 'अभी तक कोई पशु नहीं' : 'No animals yet'}</div>`;
+}
+
+function renderPersonListSetup() {
+  const persons = getPersons();
+  const el = document.getElementById('person-list-display');
+  el.innerHTML = persons.map(p => `
+    <div class="list-item" style="margin-bottom:6px">
+      <div class="list-item-left">
+        <span class="list-item-name">${p.name}</span>
+        ${p.phone ? `<div class="list-item-sub">${p.phone}</div>` : ''}
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="deletePerson('${p.id}')">✕</button>
+    </div>`).join('') || `<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${currentLang === 'hi' ? 'अभी तक कोई व्यक्ति नहीं' : 'No persons yet'}</div>`;
+}
+
+function addAnimal() {
+  const name = document.getElementById('an-name').value.trim();
+  const type = document.getElementById('an-type').value;
+  if(!name) { toast(currentLang === 'hi' ? 'पशु का नाम दर्ज करें' : 'Enter animal name'); return; }
+  const animals = getAnimals();
+  animals.push({id:genId(), name, type});
+  saveAnimals(animals);
+  document.getElementById('an-name').value = '';
+  renderAnimalListSetup();
+  toast(currentLang === 'hi' ? 'पशु जोड़ा गया' : 'Animal added');
+  syncToSheets();
+}
+
+function deleteAnimal(id) {
+  saveAnimals(getAnimals().filter(a=>a.id!==id));
+  renderAnimalListSetup();
+  syncToSheets();
+}
+
+function addPerson() {
+  const name = document.getElementById('ps-name').value.trim();
+  const phone = document.getElementById('ps-phone').value.trim();
+  if(!name) { toast(currentLang === 'hi' ? 'व्यक्ति का नाम दर्ज करें' : 'Enter person name'); return; }
+  savePersons([...getPersons(), {id:genId(), name, phone}]);
+  document.getElementById('ps-name').value = ''; document.getElementById('ps-phone').value = '';
+  renderPersonListSetup();
+  toast(currentLang === 'hi' ? 'व्यक्ति जोड़ा गया' : 'Person added');
+  syncToSheets();
+}
+
+function deletePerson(id) {
+  savePersons(getPersons().filter(p=>p.id!==id));
+  renderPersonListSetup();
+  syncToSheets();
+}
+
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if(!key) { toast(currentLang === 'hi' ? 'एपीआई कुंजी दर्ज करें' : 'Enter API key'); return; }
+  localStorage.setItem('openrouter_api_key', key);
+  document.getElementById('api-key-status').textContent = '✅ API key saved ('+key.slice(0,8)+'...)';
+  toast(currentLang === 'hi' ? 'एपीआई कुंजी सहेजी गई' : 'API key saved');
+}
+
+function exportData() {
+  const data = {
+    animals: getAnimals(), persons: getPersons(), clients: getClients(),
+    sessions: getSessions(), dispatches: getDispatches(), fat_rates: getFatRates()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'dairybook_backup_'+today()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast(currentLang === 'hi' ? 'डेटा निर्यात किया गया' : 'Data exported');
+}
+
+function loadSampleData() {
+  if(!confirm(currentLang === 'hi' ? 'यह नमूना डेटा जोड़ देगा। जारी रखें?' : 'This will add sample data. Continue?')) return;
+  const animals = [
+    {id:'a1',name:'Ganga',type:'cow'},{id:'a2',name:'Jamuna',type:'cow'},
+    {id:'a3',name:'Kali',type:'buffalo'},{id:'a4',name:'Shyama',type:'buffalo'},{id:'a5',name:'Moti',type:'ox'}
+  ];
+  const persons = [{id:'p1',name:'Ramesh',phone:'9876543210'},{id:'p2',name:'Suresh',phone:'9123456789'}];
+  const clients = [
+    {id:'c1',name:'Sharma Ji',phone:'9000000001',milk_type:'cow',daily_qty:2},
+    {id:'c2',name:'Verma Ji',phone:'9000000002',milk_type:'buffalo',daily_qty:1.5},
+    {id:'c3',name:'Gupta Ji',phone:'9000000003',milk_type:'cow',daily_qty:3}
+  ];
+  const fat_rates = [
+    {id:'fr1',milk_type:'cow',fat:4,rate:40},{id:'fr2',milk_type:'cow',fat:5,rate:46},{id:'fr3',milk_type:'cow',fat:6,rate:52},
+    {id:'fr4',milk_type:'buffalo',fat:6,rate:55},{id:'fr5',milk_type:'buffalo',fat:7,rate:62},{id:'fr6',milk_type:'buffalo',fat:8,rate:70}
+  ];
+  let sessions = [];
+  let dispatches = [];
+  const base = new Date();
+  for(let i=0;i<6;i++) {
+    const d = new Date(base); d.setDate(d.getDate()-i);
+    const ds = d.toISOString().split('T')[0];
+    sessions.push(
+      {id:genId(),date:ds,session:'morning',animal_id:'a1',animal_name:'Ganga',animal_type:'cow',qty:4.5,fat:5.2,person_id:'p1',person:'Ramesh'},
+      {id:genId(),date:ds,session:'morning',animal_id:'a2',animal_name:'Jamuna',animal_type:'cow',qty:3.8,fat:4.8,person_id:'p1',person:'Ramesh'},
+      {id:genId(),date:ds,session:'morning',animal_id:'a3',animal_name:'Kali',animal_type:'buffalo',qty:5.0,fat:7.2,person_id:'p1',person:'Ramesh'},
+      {id:genId(),date:ds,session:'evening',animal_id:'a1',animal_name:'Ganga',animal_type:'cow',qty:3.9,fat:5.0,person_id:'p2',person:'Suresh'},
+      {id:genId(),date:ds,session:'evening',animal_id:'a2',animal_name:'Jamuna',animal_type:'cow',qty:3.2,fat:4.6,person_id:'p2',person:'Suresh'},
+      {id:genId(),date:ds,session:'evening',animal_id:'a4',animal_name:'Shyama',animal_type:'buffalo',qty:4.5,fat:6.8,person_id:'p2',person:'Suresh'}
+    );
+    dispatches.push(
+      {id:genId(),date:ds,session:'morning',client_id:'c1',client_name:'Sharma Ji',milk_type:'cow',qty:2,fat:5.0,rate_per_litre:46},
+      {id:genId(),date:ds,session:'morning',client_id:'c2',client_name:'Verma Ji',milk_type:'buffalo',qty:1.5,fat:7.0,rate_per_litre:62},
+      {id:genId(),date:ds,session:'morning',client_id:'c3',client_name:'Gupta Ji',milk_type:'cow',qty:3,fat:5.2,rate_per_litre:46},
+      {id:genId(),date:ds,session:'evening',client_id:'c1',client_name:'Sharma Ji',milk_type:'cow',qty:2,fat:4.8,rate_per_litre:40},
+      {id:genId(),date:ds,session:'evening',client_id:'c3',client_name:'Gupta Ji',milk_type:'cow',qty:3,fat:5.0,rate_per_litre:46}
+    );
+  }
+  saveAnimals(animals); savePersons(persons); saveClients(clients);
+  saveFatRates(fat_rates); saveSessions(sessions); saveDispatches(dispatches);
+  toast(currentLang === 'hi' ? '✅ नमूना डेटा लोड किया गया!' : '✅ Sample data loaded!');
+  renderHome();
+  syncToSheets();
+}
+
+// ============================
+//  OPENROUTER AI ASSISTANT
+// ============================
+function buildDataContext() {
+  const animals = getAnimals();
+  const clients = getClients();
+  const sessions = getSessions();
+  const dispatches = getDispatches();
+  const fatRates = getFatRates();
+  const td = today();
+  const thisMonth = td.slice(0,7);
+
+  const todaySessions = sessions.filter(s=>s.date===td);
+  const monthSessions = sessions.filter(s=>s.date.startsWith(thisMonth));
+  const monthDispatches = dispatches.filter(d=>d.date.startsWith(thisMonth));
+
+  const clientBills = clients.map(c => {
+    const cDisp = monthDispatches.filter(d=>d.client_id===c.id);
+    const total = cDisp.reduce((a,d)=>a+(parseFloat(d.qty||0)*parseFloat(d.rate_per_litre||0)),0);
+    const qty = cDisp.reduce((a,d)=>a+parseFloat(d.qty||0),0);
+    return {name:c.name, milk_type:c.milk_type, monthly_qty:qty.toFixed(1), monthly_bill:total.toFixed(2)};
+  });
+
+  const animalStats = animals.filter(a=>a.type!=='ox').map(a => {
+    const aSess = monthSessions.filter(s=>s.animal_id===a.id);
+    const qty = aSess.reduce((a,s)=>a+parseFloat(s.qty||0),0);
+    const avgFat = aSess.length ? (aSess.reduce((a,s)=>a+parseFloat(s.fat||0),0)/aSess.length).toFixed(1) : 0;
+    return {name:a.name, type:a.type, monthly_qty:qty.toFixed(1), avg_fat:avgFat};
+  });
+
+  const language = currentLang === 'hi' ? 'Hindi (हिंदी)' : 'English';
+  
+  return `You are DairyBook AI, an assistant for a dairy farm in India.
+Today is ${td}. Current month: ${thisMonth}.
+Please respond in ${language} language.
+
+ANIMALS: ${JSON.stringify(animalStats)}
+
+CLIENTS: ${JSON.stringify(clientBills)}
+
+TODAY'S MILK COLLECTION: ${todaySessions.length} entries, total ${todaySessions.reduce((a,s)=>a+parseFloat(s.qty||0),0).toFixed(1)} L
+Cow milk today: ${todaySessions.filter(s=>s.animal_type==='cow').reduce((a,s)=>a+parseFloat(s.qty||0),0).toFixed(1)} L
+Buffalo milk today: ${todaySessions.filter(s=>s.animal_type==='buffalo').reduce((a,s)=>a+parseFloat(s.qty||0),0).toFixed(1)} L
+
+THIS MONTH DISPATCH: ${monthDispatches.length} entries
+Total dispatched this month: ${monthDispatches.reduce((a,d)=>a+parseFloat(d.qty||0),0).toFixed(1)} L
+Total billing this month: ₹${monthDispatches.reduce((a,d)=>a+(parseFloat(d.qty||0)*parseFloat(d.rate_per_litre||0)),0).toFixed(2)}
+
+FAT RATES: ${JSON.stringify(fatRates)}
+
+Be concise, friendly and helpful. Give exact numbers from the data above.`;
+}
+
+let chatHistory = [];
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  askAI(msg);
+}
+
+async function askAI(msg) {
+  const key = getApiKey();
+  if(!key) {
+    addMsg('ai', currentLang === 'hi' ? '❌ एपीआई कुंजी सेट नहीं है। कृपया सेटअप में जाकर ओपनराउटर एपीआई कुंजी दर्ज करें।' : '❌ API key not set. Please go to Setup and enter your OpenRouter API key.');
+    return;
+  }
+
+  addMsg('user', msg);
+  chatHistory.push({role:'user', content: msg});
+  goTo('ai');
+
+  const typingId = 'typing_'+Date.now();
+  const chatEl = document.getElementById('chat-messages');
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'msg ai';
+  typingDiv.id = typingId;
+  typingDiv.innerHTML = `<div class="ai-thinking"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  chatEl.appendChild(typingDiv);
+  chatEl.scrollTop = chatEl.scrollHeight;
+
+  try {
+    const sysPrompt = buildDataContext();
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: 'google/gemma-2-9b-it:free',
+        max_tokens: 1000,
+        messages: [
+          {role: 'system', content: sysPrompt},
+          ...chatHistory
+        ]
+      })
+    });
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || 'Sorry, could not get a response.';
+    chatHistory.push({role:'assistant', content: reply});
+
+    document.getElementById(typingId)?.remove();
+    addMsg('ai', reply);
+  } catch(e) {
+    document.getElementById(typingId)?.remove();
+    addMsg('ai', '❌ Error: '+e.message+'. ' + (currentLang === 'hi' ? 'कृपया अपनी एपीआई कुंजी और इंटरनेट कनेक्शन जांचें।' : 'Please check your API key and internet connection.'));
+  }
+}
+
+function addMsg(role, text) {
+  const chatEl = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg '+role;
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${nowTime()}</div>`;
+  chatEl.appendChild(div);
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+// ============================
+//  INIT
+// ============================
+function init() {
+  const d = new Date();
+  document.getElementById('todayDate').textContent = d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+  if(!localStorage.getItem('current_fiscal_year')) {
+    localStorage.setItem('current_fiscal_year', getCurrentFiscalYear());
+  }
+  if(getAutoFyCheck()) {
+    const currentFy = getCurrentFiscalYear();
+    const savedFy = localStorage.getItem('current_fiscal_year');
+    if(savedFy !== currentFy) {
+      setTimeout(() => {
+        if(confirm(translations[currentLang].archiveWarning + '\n\n' + translations[currentLang].archiveConfirm)) {
+          archiveCurrentData();
+        }
+      }, 500);
+    }
+  }
+  updateFiscalYearDisplay();
+  renderHome();
+}
+
+init();
+</script>
+</body>
+</html>
