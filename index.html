@@ -379,6 +379,42 @@ body {
   color: var(--red);
 }
 </style>
+<!-- PWA Support - Cross Platform -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Android/Chrome -->
+<meta name="theme-color" content="#5C3D2E">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DairyBook">
+
+<!-- iOS Icons -->
+<link rel="apple-touch-icon" href="icons/ios/ios-180.png" sizes="180x180">
+<link rel="apple-touch-icon" href="icons/ios/ios-152.png" sizes="152x152">
+<link rel="apple-touch-icon" href="icons/ios/ios-120.png" sizes="120x120">
+<link rel="apple-touch-icon" href="icons/ios/ios-76.png" sizes="76x76">
+
+<!-- Windows -->
+<meta name="msapplication-TileColor" content="#5C3D2E">
+<meta name="msapplication-TileImage" content="icons/windows/windows11_medium.png">
+
+<!-- Register Service Worker -->
+<script>
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+      })
+      .catch(error => {
+        console.log('Service Worker registration failed:', error);
+      });
+  });
+}
+</script>
 </head>
 <body>
 
