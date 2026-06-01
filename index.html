@@ -1,969 +1,983 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>DairyBook – दुग्ध प्रबंधन प्रणाली</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>DairyBook</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- PWA Support -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/ios/180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DairyBook">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #dbeafe;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --purple: #7c3aed;
+      --purple-light: #f3e8ff;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --font-head: 'Baloo 2', cursive;
+      --font-body: 'Noto Sans', sans-serif;
+    }
 
-<!-- PWA Support -->
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/ios/180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="DairyBook">
-<meta name="theme-color" content="#5C3D2E">
-<meta name="mobile-web-app-capable" content="yes">
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-<style>
-:root {
-  --cream:#FDF6EC;--milk:#FFFDF8;--brown:#5C3D2E;--brown-light:#8B6347;--brown-pale:#E8D5C0;
-  --green:#2E7D5C;--green-light:#4CAF85;--green-pale:#D4EDE3;
-  --amber:#D4820A;--amber-pale:#FFF0CC;
-  --blue:#1A6FA8;--blue-pale:#DDEEFF;
-  --red:#C0392B;--red-pale:#FDECEA;
-  --purple:#6B3FA0;--purple-pale:#EDE5F8;
-  --teal:#0F7B6C;--teal-pale:#D4F0EB;
-  --text:#2C1810;--text-soft:#7A5C50;--border:#E0CCBB;
-  --shadow:0 2px 12px rgba(92,61,46,0.10);--radius:14px;
-  --font-head:'Baloo 2',cursive;--font-body:'Noto Sans',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:var(--font-body);background:var(--cream);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:80px}
+    body {
+      font-family: var(--font-body);
+      background-color: var(--background);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
 
-.lang-toggle{position:fixed;top:70px;right:10px;z-index:200;background:var(--brown);border-radius:30px;padding:4px;display:flex;gap:4px;box-shadow:var(--shadow)}
-.lang-btn{padding:5px 12px;border:none;border-radius:30px;cursor:pointer;font-weight:600;font-size:12px;background:transparent;color:#fff;opacity:0.6}
-.lang-btn.active{background:var(--amber);opacity:1}
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-.topbar{background:var(--brown);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.topbar h1{font-family:var(--font-head);font-size:22px;font-weight:700}
-.topbar .sub{font-size:11px;opacity:0.7;margin-top:-2px}
-.topbar-right{font-size:12px;opacity:0.8;text-align:right}
-.fy-badge{background:var(--amber);padding:2px 8px;border-radius:20px;font-size:10px;margin-left:8px}
+    .brand {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
 
-.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--brown);display:flex;z-index:100}
-.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 10px;cursor:pointer;opacity:0.55;transition:opacity 0.15s;border:none;background:none;color:#fff;font-family:var(--font-body)}
-.bnav-item.active{opacity:1}
-.bnav-item .icon{font-size:22px;margin-bottom:2px}
-.bnav-item .label{font-size:10px;font-weight:500}
+    .lang-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
 
-.screen{display:none;padding:12px 14px}
-.screen.active{display:block}
-.card{background:var(--milk);border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
-.card-title{font-family:var(--font-head);font-size:15px;font-weight:600;color:var(--brown);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.sec-header{font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--brown);margin:6px 0 12px}
+    .screen {
+      display: none;
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.stat-box{background:var(--milk);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow)}
-.stat-num{font-family:var(--font-head);font-size:24px;font-weight:700}
-.stat-label{font-size:11px;color:var(--text-soft);margin-top:2px}
-.stat-box.green{background:var(--green-pale);border-color:var(--green-light)}.stat-box.green .stat-num{color:var(--green)}
-.stat-box.amber{background:var(--amber-pale);border-color:var(--amber)}.stat-box.amber .stat-num{color:var(--amber)}
-.stat-box.blue{background:var(--blue-pale);border-color:var(--blue)}.stat-box.blue .stat-num{color:var(--blue)}
-.stat-box.brown{background:#F5EAE0;border-color:var(--brown-light)}.stat-box.brown .stat-num{color:var(--brown)}
-.stat-box.teal{background:var(--teal-pale);border-color:var(--teal)}.stat-box.teal .stat-num{color:var(--teal)}
-.stat-box.red{background:var(--red-pale);border-color:var(--red)}.stat-box.red .stat-num{color:var(--red)}
+    .screen.active {
+      display: block;
+    }
 
-.form-row{margin-bottom:10px}
-.form-label{font-size:12px;color:var(--text-soft);margin-bottom:4px;font-weight:500}
-.form-input,.form-select{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--milk);font-family:var(--font-body);font-size:14px;color:var(--text);outline:none}
-.form-input:focus,.form-select:focus{border-color:var(--brown-light)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:10px;border:none;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:transform 0.1s,opacity 0.1s}
-.btn:active{transform:scale(0.97)}
-.btn-primary{background:var(--green);color:#fff}
-.btn-amber{background:var(--amber);color:#fff}
-.btn-brown{background:var(--brown);color:#fff}
-.btn-teal{background:var(--teal);color:#fff}
-.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
-.btn-full{width:100%}
-.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
-.btn-wa{background:#25D366;color:#fff}
-.btn-danger{background:var(--red);color:#fff}
+    h2 {
+      font-family: var(--font-head);
+      font-size: 20px;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
 
-.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
-.badge-cow{background:var(--blue-pale);color:var(--blue)}
-.badge-buffalo{background:var(--purple-pale);color:var(--purple)}
-.badge-mix{background:var(--teal-pale);color:var(--teal)}
-.badge-bulk{background:#E8F5E9;color:#1B5E20}
-.badge-retail{background:var(--amber-pale);color:var(--amber)}
-.badge-cash{background:#FFF0CC;color:#b36b00}
-.badge-credit{background:var(--red-pale);color:var(--red)}
-.badge-paid{background:var(--green-pale);color:var(--green)}
+    .form-group {
+      margin-bottom: 14px;
+    }
 
-.mini-table{width:100%;border-collapse:collapse;font-size:13px}
-.mini-table th{color:var(--text-soft);font-weight:600;font-size:11px;text-align:left;padding:4px 6px;border-bottom:1px solid var(--border)}
-.mini-table td{padding:7px 6px;border-bottom:1px solid #F0E8E0;color:var(--text)}
-.mini-table tr:last-child td{border-bottom:none}
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
 
-.list-item{background:var(--milk);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.list-item-left{flex:1}
-.list-item-name{font-weight:600;font-size:14px}
-.list-item-sub{font-size:12px;color:var(--text-soft);margin-top:2px}
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+    }
 
-.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px)}
-.chat-messages{flex:1;overflow-y:auto;padding:4px 0 12px}
-.msg{margin-bottom:10px;display:flex;flex-direction:column}
-.msg.user{align-items:flex-end}.msg.ai{align-items:flex-start}
-.msg-bubble{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5}
-.msg.user .msg-bubble{background:var(--brown);color:#fff;border-bottom-right-radius:4px}
-.msg.ai .msg-bubble{background:var(--milk);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px}
-.msg-time{font-size:10px;color:var(--text-soft);margin-top:3px;padding:0 4px}
-.chat-input-row{display:flex;gap:8px;padding:8px 0 2px;border-top:1px solid var(--border)}
-.chat-input{flex:1;padding:10px 14px;border-radius:20px;border:1.5px solid var(--border);font-family:var(--font-body);font-size:14px;background:var(--milk);color:var(--text);outline:none}
-.chat-input:focus{border-color:var(--brown-light)}
-.chat-send{width:42px;height:42px;border-radius:50%;background:var(--brown);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+    }
 
-.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.chip{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--milk);font-size:12px;cursor:pointer;color:var(--text-soft);font-family:var(--font-body)}
-.chip:active{background:var(--brown-pale)}
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--brown);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1}
-.divider{height:1px;background:var(--border);margin:12px 0}
+    .toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
 
-.typing-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text-soft);margin:0 2px;animation:blink 1.2s infinite}
-.typing-dots span:nth-child(2){animation-delay:0.2s}.typing-dots span:nth-child(3){animation-delay:0.4s}
-@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
-.ai-thinking{background:var(--milk);border:1px solid var(--border);border-radius:16px;padding:10px 14px;display:inline-block;border-bottom-left-radius:4px}
+    .toggle-btn {
+      background: var(--background);
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
 
-.session-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:12px}
-.session-toggle button{flex:1;padding:9px;border:none;background:transparent;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s,color 0.15s;color:var(--text-soft)}
-.session-toggle button.active{background:var(--brown);color:#fff}
+    .toggle-btn.active {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
 
-.session-fat-box{background:var(--amber-pale);border:1px solid var(--amber);border-radius:10px;padding:12px;margin-bottom:12px}
-.session-fat-title{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:8px}
-.fat-input-row{display:flex;gap:10px;align-items:center;margin-bottom:6px}
-.fat-input-row label{font-size:13px;font-weight:600;min-width:80px}
-.fat-input-row input{flex:1;padding:8px 10px;border-radius:8px;border:1.5px solid var(--amber);background:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--amber);outline:none;text-align:center}
-.fat-result{font-size:12px;color:var(--text-soft);margin-top:4px;padding:6px 10px;background:rgba(255,255,255,0.6);border-radius:6px}
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+      display: block;
+      margin-bottom: 10px;
+    }
 
-.client-type-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:10px}
-.client-type-toggle button{flex:1;padding:8px;border:none;background:transparent;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);transition:background 0.15s}
-.client-type-toggle button.active.bulk{background:#1B5E20;color:#fff}
-.client-type-toggle button.active.retail{background:var(--amber);color:#fff}
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-purple { background: var(--purple); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-outline-danger {
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
 
-.dispatch-client-card{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:12px;background:var(--milk)}
-.dispatch-client-card.bulk{border-left:4px solid #1B5E20}
-.dispatch-client-card.retail{border-left:4px solid var(--amber)}
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
 
-.bill-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--border)}
-.bill-row:last-child{border:none;font-weight:700;font-size:15px;padding-top:10px}
-.bill-total{color:var(--green)}
-.payment-summary{background:var(--green-pale);border:1px solid var(--green-light);border-radius:10px;padding:10px 13px;margin-top:8px}
-.share-buttons{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+    .mini-table th, .mini-table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
 
-.cash-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
-.cash-toggle{display:flex;border-radius:8px;overflow:hidden;border:1.5px solid var(--border)}
-.cash-toggle button{flex:1;padding:6px 10px;border:none;background:transparent;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft);white-space:nowrap}
-.cash-toggle button.active{background:var(--amber);color:#fff}
+    .mini-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
 
-.coop-rate-box{background:#E8F5E9;border:1px solid #4CAF50;border-radius:10px;padding:10px 13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.coop-rate-label{font-size:13px;color:#1B5E20;font-weight:600}
-.coop-rate-val{font-family:var(--font-head);font-size:16px;color:#1B5E20;font-weight:700}
+    .alert-info {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
 
-.default-rate-box{background:var(--amber-pale);border:1px solid var(--amber);border-radius:10px;padding:10px 13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.default-rate-label{font-size:13px;color:var(--amber);font-weight:600}
-.default-rate-val{font-family:var(--font-head);font-size:16px;color:var(--amber);font-weight:700}
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
 
-.fy-card{background:linear-gradient(135deg,var(--green-pale) 0%,var(--milk) 100%);border-left:4px solid var(--green)}
-.fy-stats{display:flex;justify-content:space-between;margin:8px 0;padding:8px;background:rgba(255,255,255,0.5);border-radius:8px;font-size:13px}
-.warning-box{background:var(--red-pale);border:1px solid var(--red);border-radius:8px;padding:8px;margin:8px 0;font-size:12px;color:var(--red)}
-.info-box{background:var(--blue-pale);border:1px solid var(--blue);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--blue);line-height:1.5}
-</style>
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      background: none;
+      border: none;
+      flex: 1;
+      padding: 4px 0;
+    }
+
+    .nav-item span:first-child {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
 
-<div class="lang-toggle">
-  <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-  <button class="lang-btn" onclick="setLanguage('hi')">हिंदी</button>
-</div>
+  <header>
+    <div class="brand">🥛 DairyBook</div>
+    <button class="lang-btn" onclick="toggleLang()" id="btn-lang">हिंदी</button>
+  </header>
 
-<div class="topbar">
-  <div>
-    <div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:#fff">🥛 DairyBook</div>
-    <div class="sub">Milk Management <span class="fy-badge" id="fyBadge"></span></div>
-  </div>
-  <div class="topbar-right" id="todayDate"></div>
-</div>
-
-<!-- HOME -->
-<div class="screen active" id="screen-home">
-  <div class="sec-header" id="lbl-home-hdr">Today's Summary</div>
-  <div class="stat-grid">
-    <div class="stat-box green"><div class="stat-num" id="h-total">0 L</div><div class="stat-label" id="lbl-h-total">Total milk today</div></div>
-    <div class="stat-box amber"><div class="stat-num" id="h-sessions">0</div><div class="stat-label" id="lbl-h-sess">Sessions</div></div>
-    <div class="stat-box blue"><div class="stat-num" id="h-cow">0 L</div><div class="stat-label" id="lbl-h-cow">Cow milk</div></div>
-    <div class="stat-box brown"><div class="stat-num" id="h-buf">0 L</div><div class="stat-label" id="lbl-h-buf">Buffalo milk</div></div>
-  </div>
-  <div id="home-fat-banner"></div>
-  <div class="card">
-    <div class="card-title">🌅 <span id="lbl-morning">Morning session</span></div>
-    <div id="home-morning-list"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">🌇 <span id="lbl-evening">Evening session</span></div>
-    <div id="home-evening-list"></div>
-  </div>
-  <button class="btn btn-primary btn-full" onclick="goTo('entry')" id="lbl-record-btn">➕ Record Milk Session</button>
-</div>
-
-<!-- ENTRY -->
-<div class="screen" id="screen-entry">
-  <div class="sec-header" id="lbl-entry-hdr">Record Milk Session</div>
-  <div class="card">
-    <div class="form-row"><div class="form-label" id="lbl-date">Date</div><input type="date" class="form-input" id="entry-date" onchange="onEntryDateChange()"></div>
-    <div class="session-toggle">
-      <button class="active" id="btn-morning" onclick="setSession('morning')">🌅 <span id="lbl-s-morn">Morning</span></button>
-      <button id="btn-evening" onclick="setSession('evening')">🌇 <span id="lbl-s-eve">Evening</span></button>
-    </div>
-    <div class="form-row">
-      <div class="form-label" id="lbl-person">Feeding Person</div>
-      <select class="form-select" id="entry-person"></select>
-    </div>
-  </div>
-  <div class="session-fat-box">
-    <div class="session-fat-title" id="lbl-session-fat">📊 Session Fat% Reading (measured after milking)</div>
-    <div class="fat-input-row">
-      <label>🐄 <span id="lbl-cow-fat-lbl">Cow fat%</span></label>
-      <input type="number" id="session-cow-fat" placeholder="e.g. 5.2" step="0.1" oninput="onFatInput()">
-    </div>
-    <div class="fat-input-row">
-      <label>🐃 <span id="lbl-buf-fat-lbl">Buffalo fat%</span></label>
-      <input type="number" id="session-buf-fat" placeholder="e.g. 7.0" step="0.1" oninput="onFatInput()">
-    </div>
-    <div class="fat-result" id="fat-calc-result"></div>
-  </div>
-  <div class="card">
-    <div class="card-title">🐄 <span id="lbl-cow-entries">Cow animals — qty (L)</span></div>
-    <div id="cow-entries"></div>
-    <button class="btn btn-outline btn-sm" onclick="addAnimalRow('cow')" id="lbl-add-cow">+ Add cow</button>
-  </div>
-  <div class="card">
-    <div class="card-title">🐃 <span id="lbl-buf-entries">Buffalo animals — qty (L)</span></div>
-    <div id="buffalo-entries"></div>
-    <button class="btn btn-outline btn-sm" onclick="addAnimalRow('buffalo')" id="lbl-add-buf">+ Add buffalo</button>
-  </div>
-  <button class="btn btn-primary btn-full" onclick="saveSession()" style="margin-top:6px" id="lbl-save-sess">✅ Save Session</button>
-</div>
-
-<!-- DISPATCH -->
-<div class="screen" id="screen-clients">
-  <div class="sec-header" id="lbl-dispatch-hdr">Client Dispatch</div>
-  <div class="card">
-    <div class="card-title" id="lbl-dispatch-card">📋 Record dispatch</div>
-    <div class="form-row"><div class="form-label" id="lbl-d-date">Date</div><input type="date" class="form-input" id="dispatch-date" onchange="onDispatchDateChange()"></div>
-    <div class="session-toggle">
-      <button class="active" id="btn-d-morn" onclick="setDispatchSession('morning')">🌅 <span id="lbl-d-morn">Morning</span></button>
-      <button id="btn-d-eve" onclick="setDispatchSession('evening')">🌇 <span id="lbl-d-eve">Evening</span></button>
-    </div>
-    <div id="dispatch-fat-info"></div>
-    <div id="dispatch-client-rows"></div>
-    <button class="btn btn-primary btn-full" onclick="saveDispatch()" style="margin-top:6px" id="lbl-save-dispatch">✅ Save Dispatch</button>
-  </div>
-  <div class="divider"></div>
-  <div style="font-family:var(--font-head);font-size:15px;font-weight:600;color:var(--brown);margin-bottom:8px" id="lbl-client-list">👥 Clients</div>
-  <div id="client-list-display"></div>
-  <button class="btn btn-outline btn-full" onclick="showAddClient()" id="lbl-add-client-btn">+ Add new client</button>
-  <div id="add-client-form" style="display:none;margin-top:12px">
+  <!-- SCREEN 1: ENTRY -->
+  <main class="screen active" id="screen-entry">
     <div class="card">
-      <div class="card-title" id="lbl-add-client-hdr">Add Client</div>
-      <div class="form-row"><div class="form-label" id="lbl-cl-name">Name</div><input type="text" class="form-input" id="cl-name" placeholder="Client name"></div>
-      <div class="form-row"><div class="form-label" id="lbl-cl-phone">Phone</div><input type="tel" class="form-input" id="cl-phone" placeholder="Mobile number"></div>
-      <div class="form-row">
-        <div class="form-label" id="lbl-cl-type-hdr">Client Type</div>
-        <div class="client-type-toggle">
-          <button class="active bulk" id="cl-type-bulk" onclick="setClientTypeUI('bulk')">🏭 Bulk / Cooperative</button>
-          <button class="retail" id="cl-type-retail" onclick="setClientTypeUI('retail')">🏠 Retail / Regular</button>
-        </div>
-        <input type="hidden" id="cl-client-type" value="bulk">
+      <h2 id="lbl-session-config">Session Configuration</h2>
+      <div class="form-group">
+        <label id="lbl-date">Date</label>
+        <input type="date" id="entry-date" onchange="onDateOrSessionChange()">
       </div>
-      <div id="bulk-milk-info" class="info-box">🏭 <span id="lbl-bulk-info">Bulk buyers take mix of cow + buffalo milk. Billed by fat% using cooperative rates.</span></div>
-      <div id="retail-milk-row" style="display:none">
-        <div class="form-row">
-          <div class="form-label" id="lbl-milk-type">Milk type</div>
-          <select class="form-select" id="cl-milk-type">
-            <option value="cow">🐄 Cow / गाय</option>
-            <option value="buffalo">🐃 Buffalo / भैंस</option>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="btn-morning" onclick="setSession('morning')">🌅 <span id="lbl-morn">Morning</span></button>
+        <button class="toggle-btn" id="btn-evening" onclick="setSession('evening')">🌃 <span id="lbl-eve">Evening</span></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 id="lbl-fat-rates">Fat Rates (per 10 Fat)</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-cow-fat-rate">Cow Fat Rate (₹)</label>
+          <input type="number" step="0.1" id="session-cow-fat" placeholder="e.g. 70" oninput="onFatInput()">
+        </div>
+        <div class="form-group">
+          <label id="lbl-buf-fat-rate">Buffalo Fat Rate (₹)</label>
+          <input type="number" step="0.1" id="session-buf-fat" placeholder="e.g. 100" oninput="onFatInput()">
+        </div>
+      </div>
+      <div class="alert-info" id="rate-calc-preview">
+        Enter session fat rates to preview basic distribution calculation equations.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 id="lbl-add-entry">Add Farmer Collection Entry</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-farmer-id">Farmer ID</label>
+          <input type="number" id="entry-id" placeholder="ID" oninput="onFarmerIdInput()">
+        </div>
+        <div class="form-group">
+          <label id="lbl-farmer-name">Farmer Name</label>
+          <input type="text" id="entry-name" readonly placeholder="Auto-loaded">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-animal-type">Animal Type</label>
+          <select id="entry-type" onchange="calculateEntryRow()">
+            <option value="cow" id="opt-cow">Cow</option>
+            <option value="buffalo" id="opt-buf">Buffalo</option>
           </select>
         </div>
-        <div class="info-box" style="background:var(--amber-pale);border-color:var(--amber);color:var(--amber)">🏠 <span id="lbl-retail-info">Retail clients billed at flat ₹/litre rate. Set default rates in Setup.</span></div>
+        <div class="form-group">
+          <label id="lbl-liters">Liters</label>
+          <input type="number" step="0.1" id="entry-liters" placeholder="0.0" oninput="calculateEntryRow()">
+        </div>
       </div>
-      <div class="form-row"><div class="form-label" id="lbl-cl-qty">Daily qty (L)</div><input type="number" class="form-input" id="cl-qty" placeholder="e.g. 2"></div>
-      <button class="btn btn-primary btn-full" onclick="addClient()" id="lbl-add-cl-submit">Add Client</button>
-    </div>
-  </div>
-</div>
 
-<!-- BILLING -->
-<div class="screen" id="screen-billing">
-  <div class="sec-header" id="lbl-billing-hdr">Monthly Billing</div>
-  <div class="card">
-    <div class="card-title" id="lbl-gen-bill">📅 Generate Bill</div>
-    <div class="form-grid">
-      <div class="form-row"><div class="form-label" id="lbl-b-client">Client</div><select class="form-select" id="bill-client"><option value="" id="lbl-all-clients">All clients</option></select></div>
-      <div class="form-row"><div class="form-label" id="lbl-b-month">Month</div><input type="month" class="form-input" id="bill-month"></div>
-    </div>
-    <button class="btn btn-amber btn-full" onclick="generateBill()" id="lbl-gen-bill-btn">🧾 Generate Bill</button>
-  </div>
-  <div id="bill-output"></div>
-  <div class="card">
-    <div class="card-title" id="lbl-fat-rate-hdr">⚙️ Fat Rate Table (Cooperative)</div>
-    <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="lbl-fat-rate-info">Used for bulk client billing: fat% → ₹/L lookup</div>
-    <table class="mini-table"><thead><tr><th id="lbl-ft-type">Type</th><th id="lbl-ft-fat">Fat%</th><th id="lbl-ft-rate">₹/L</th><th></th></tr></thead><tbody id="fat-rate-body"></tbody></table>
-    <div style="margin-top:10px">
-      <div class="form-grid3">
-        <select class="form-select" id="fr-type"><option value="cow">Cow</option><option value="buffalo">Buffalo</option><option value="mix">Mix</option></select>
-        <input type="number" class="form-input" id="fr-fat" placeholder="Fat%" step="0.5">
-        <input type="number" class="form-input" id="fr-rate" placeholder="₹/L">
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-measured-fat">Measured Fat</label>
+          <input type="number" step="0.1" id="entry-fat" placeholder="0.0" oninput="calculateEntryRow()">
+        </div>
+        <div class="form-group">
+          <label id="lbl-total-amt">Calculated Amount (₹)</label>
+          <input type="number" id="entry-amount" readonly placeholder="0.00">
+        </div>
       </div>
-      <button class="btn btn-outline btn-full btn-sm" onclick="addFatRate()" style="margin-top:8px" id="lbl-add-rate-btn">+ Add</button>
+
+      <button class="btn btn-primary" id="btn-save-entry" onclick="saveRecordEntry()">Save Data Entry</button>
     </div>
-  </div>
-</div>
+  </main>
 
-<!-- AI -->
-<div class="screen" id="screen-ai">
-  <div class="sec-header" id="lbl-ai-hdr">🤖 AI Assistant</div>
-  <div class="chip-row" id="quick-chips"></div>
-  <div class="chat-wrap">
-    <div class="chat-messages" id="chat-messages">
-      <div class="msg ai"><div class="msg-bubble" id="lbl-ai-welcome">Namaste! 🙏 Ask me anything — bills, fat totals, cash collected, outstanding, animal productivity!</div><div class="msg-time">Now</div></div>
-    </div>
-    <div class="chat-input-row">
-      <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()">
-      <button class="chat-send" onclick="sendChat()">➤</button>
-    </div>
-  </div>
-</div>
-
-<!-- SETUP -->
-<div class="screen" id="screen-setup">
-  <div class="sec-header" id="lbl-setup-hdr">Setup</div>
-  <div class="card" style="border-left:4px solid #1B5E20">
-    <div class="card-title">🏭 <span id="lbl-coop-rates-hdr">Cooperative Rates (Bulk Billing)</span></div>
-    <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px" id="lbl-coop-rates-info">For bulk/cooperative clients — fat% determines rate. Enter your milk union rate table.</div>
-    <div id="coop-rates-display"></div>
-    <div class="form-grid3" style="margin-top:10px">
-      <select class="form-select" id="cr-type"><option value="cow">Cow</option><option value="buffalo">Buffalo</option><option value="mix">Mix</option></select>
-      <input type="number" class="form-input" id="cr-fat" placeholder="Fat%" step="0.1">
-      <input type="number" class="form-input" id="cr-rate" placeholder="₹/L">
-    </div>
-    <button class="btn btn-sm btn-full" style="background:#1B5E20;color:#fff;margin-top:8px" onclick="addCoopRate()" id="lbl-add-coop-btn">+ Add cooperative rate</button>
-  </div>
-  <div class="card" style="border-left:4px solid var(--amber)">
-    <div class="card-title">🏠 <span id="lbl-retail-rates-hdr">Retail Rates (Default ₹/L)</span></div>
-    <div style="font-size:12px;color:var(--text-soft);margin-bottom:10px" id="lbl-retail-rates-info">For retail clients — flat rate per litre. No fat calculation. Set once, auto-fills in dispatch.</div>
-    <div id="retail-rates-display"></div>
-    <div class="form-grid3" style="margin-top:10px">
-      <select class="form-select" id="rr-type"><option value="cow">🐄 Cow</option><option value="buffalo">🐃 Buffalo</option></select>
-      <input type="number" class="form-input" id="rr-rate" placeholder="₹/L" step="0.5">
-      <button class="btn btn-amber btn-sm" onclick="saveRetailRate()" id="lbl-save-retail-btn">Save</button>
-    </div>
-  </div>
-  <div class="card fy-card">
-    <div class="card-title">📅 <span id="lbl-fy-hdr">Fiscal Year</span> <span style="background:var(--green);padding:2px 8px;border-radius:20px;font-size:10px;color:#fff" id="currentFyBadge"></span></div>
-    <div class="fy-stats"><div><strong id="lbl-fy-current">Current FY:</strong> <span id="displayCurrentFy">-</span></div><div><strong id="lbl-fy-start">Started:</strong> <span id="displayFyStart">-</span></div></div>
-    <div class="fy-stats"><div><strong id="lbl-fy-sess">Sessions:</strong> <span id="fySessionsCount">0</span></div><div><strong id="lbl-fy-disp">Dispatches:</strong> <span id="fyDispatchesCount">0</span></div></div>
-    <div id="fyWarningBox" class="warning-box" style="display:none"></div>
-    <div class="form-grid" style="margin-top:8px">
-      <button class="btn btn-amber btn-sm" onclick="showFiscalYearDialog()" id="lbl-fy-archive-btn">📦 Archive & New FY</button>
-      <button class="btn btn-outline btn-sm" onclick="viewArchivedData()" id="lbl-fy-view-btn">📜 View Archived</button>
-    </div>
-  </div>
-  <div class="card"><div class="card-title" id="lbl-animals-hdr">🐄 Animals</div><div id="animal-list-display"></div>
-    <div style="margin-top:10px"><div class="form-grid"><input type="text" class="form-input" id="an-name" placeholder="Animal name"><select class="form-select" id="an-type"><option value="cow">Cow / गाय</option><option value="buffalo">Buffalo / भैंस</option><option value="ox">Ox / बैल</option></select></div>
-    <button class="btn btn-brown btn-full btn-sm" onclick="addAnimal()" style="margin-top:8px" id="lbl-add-animal-btn">+ Add animal</button></div>
-  </div>
-  <div class="card"><div class="card-title" id="lbl-persons-hdr">👤 Feeding Persons</div><div id="person-list-display"></div>
-    <div style="margin-top:10px"><div class="form-grid"><input type="text" class="form-input" id="ps-name" placeholder="Person name"><input type="tel" class="form-input" id="ps-phone" placeholder="Phone"></div>
-    <button class="btn btn-brown btn-full btn-sm" onclick="addPerson()" style="margin-top:8px" id="lbl-add-person-btn">+ Add person</button></div>
-  </div>
-  <div class="card"><div class="card-title" id="lbl-api-hdr">🔑 AI API Key (OpenRouter)</div><div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="lbl-api-info">Free AI — get key at openrouter.ai</div>
-    <input type="password" class="form-input" id="api-key-input" placeholder="sk-or-v1-...">
-    <button class="btn btn-brown btn-full btn-sm" onclick="saveApiKey()" style="margin-top:8px" id="lbl-save-api-btn">Save API Key</button>
-    <div id="api-key-status" style="font-size:12px;margin-top:6px;color:var(--green)"></div>
-  </div>
-  <div class="card"><div class="card-title" id="lbl-sheets-hdr">📊 Google Sheets</div><input type="text" class="form-input" id="sheets-script-url" placeholder="Apps Script Web App URL">
-    <button class="btn btn-brown btn-full btn-sm" onclick="saveSheetsUrl()" style="margin-top:8px" id="lbl-sheets-btn">🔗 Connect</button><div id="sheets-status" style="font-size:12px;margin-top:6px"></div>
-  </div>
-  <div class="card"><div class="card-title" style="color:var(--red)" id="lbl-data-hdr">⚠️ Data</div>
-    <button class="btn btn-outline btn-full btn-sm" onclick="exportData()" id="lbl-export-btn">📤 Export JSON</button>
-    <button class="btn btn-outline btn-full btn-sm" onclick="loadSampleData()" style="margin-top:8px" id="lbl-sample-btn">🎯 Load sample data</button>
-    <button class="btn btn-outline btn-full btn-sm" onclick="syncToSheets()" style="margin-top:8px" id="lbl-sync-btn">🔄 Sync to Sheets</button>
-    <button class="btn btn-danger btn-full btn-sm" onclick="resetAllData()" style="margin-top:8px" id="lbl-reset-btn">⚠️ Reset All Data</button>
-  </div>
-</div>
-
-<div class="bottomnav">
-  <button class="bnav-item active" onclick="goTo('home')"><div class="icon">🏠</div><div class="label" id="nav-home">Home</div></button>
-  <button class="bnav-item" onclick="goTo('entry')"><div class="icon">🥛</div><div class="label" id="nav-entry">Entry</div></button>
-  <button class="bnav-item" onclick="goTo('clients')"><div class="icon">👥</div><div class="label" id="nav-dispatch">Dispatch</div></button>
-  <button class="bnav-item" onclick="goTo('billing')"><div class="icon">🧾</div><div class="label" id="nav-bills">Bills</div></button>
-  <button class="bnav-item" onclick="goTo('ai')"><div class="icon">🤖</div><div class="label" id="nav-ai">AI</div></button>
-  <button class="bnav-item" onclick="goTo('setup')"><div class="icon">⚙️</div><div class="label" id="nav-setup">Setup</div></button>
-</div>
-<div class="toast" id="toast"></div>
-
-<script>
-// Register Service Worker
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').then(reg=>console.log('SW registered:',reg.scope)).catch(err=>console.log('SW error:',err));
-  });
-}
-
-// ══════════════════════════════════════════
-//  LANGUAGE
-// ══════════════════════════════════════════
-let currentLang = localStorage.getItem('dairy_lang') || 'en';
-
-const T = {
-  en:{
-    'lbl-home-hdr':"Today's Summary",'lbl-h-total':'Total milk today','lbl-h-sess':'Sessions',
-    'lbl-h-cow':'Cow milk','lbl-h-buf':'Buffalo milk','lbl-morning':'Morning session',
-    'lbl-evening':'Evening session','lbl-record-btn':'➕ Record Milk Session',
-    'lbl-entry-hdr':'Record Milk Session','lbl-date':'Date','lbl-person':'Feeding Person',
-    'lbl-s-morn':'Morning','lbl-s-eve':'Evening',
-    'lbl-session-fat':'📊 Session Fat% Reading (measured after milking)',
-    'lbl-cow-fat-lbl':'Cow fat%','lbl-buf-fat-lbl':'Buffalo fat%',
-    'lbl-cow-entries':'Cow animals — qty (L)','lbl-buf-entries':'Buffalo animals — qty (L)',
-    'lbl-add-cow':'+ Add cow','lbl-add-buf':'+ Add buffalo','lbl-save-sess':'✅ Save Session',
-    'lbl-dispatch-hdr':'Client Dispatch','lbl-dispatch-card':'📋 Record dispatch','lbl-d-date':'Date',
-    'lbl-d-morn':'Morning','lbl-d-eve':'Evening','lbl-save-dispatch':'✅ Save Dispatch',
-    'lbl-client-list':'👥 Clients','lbl-add-client-btn':'+ Add new client','lbl-add-client-hdr':'Add Client',
-    'lbl-cl-name':'Name','lbl-cl-phone':'Phone','lbl-cl-type-hdr':'Client Type',
-    'lbl-bulk-info':'Bulk buyers take mix of cow + buffalo milk. Billed by fat% using cooperative rates.',
-    'lbl-retail-info':'Retail clients billed at flat ₹/litre. Set default rates in Setup.',
-    'lbl-cl-qty':'Daily qty (L)','lbl-add-cl-submit':'Add Client',
-    'lbl-billing-hdr':'Monthly Billing','lbl-gen-bill':'📅 Generate Bill',
-    'lbl-b-client':'Client','lbl-all-clients':'All clients','lbl-b-month':'Month',
-    'lbl-gen-bill-btn':'🧾 Generate Bill',
-    'lbl-fat-rate-hdr':'⚙️ Fat Rate Table (Cooperative)','lbl-fat-rate-info':'Used for bulk billing: fat% → ₹/L',
-    'lbl-ft-type':'Type','lbl-ft-fat':'Fat%','lbl-ft-rate':'₹/L','lbl-add-rate-btn':'+ Add',
-    'lbl-ai-hdr':'🤖 AI Assistant','lbl-ai-welcome':'Namaste! 🙏 Ask me anything — bills, fat totals, cash, outstanding, animal productivity!',
-    'lbl-setup-hdr':'Setup',
-    'lbl-coop-rates-hdr':'Cooperative Rates (Bulk Billing)',
-    'lbl-coop-rates-info':'For bulk/cooperative clients — fat% determines rate. Enter your milk union rate table.',
-    'lbl-add-coop-btn':'+ Add cooperative rate',
-    'lbl-retail-rates-hdr':'Retail Rates (Default ₹/L)',
-    'lbl-retail-rates-info':'For retail clients — flat rate per litre. No fat calculation.',
-    'lbl-save-retail-btn':'Save',
-    'lbl-fy-hdr':'Fiscal Year','lbl-fy-current':'Current FY:','lbl-fy-start':'Started:',
-    'lbl-fy-sess':'Sessions:','lbl-fy-disp':'Dispatches:',
-    'lbl-fy-archive-btn':'📦 Archive & New FY','lbl-fy-view-btn':'📜 View Archived',
-    'lbl-animals-hdr':'🐄 Animals','lbl-add-animal-btn':'+ Add animal',
-    'lbl-persons-hdr':'👤 Feeding Persons','lbl-add-person-btn':'+ Add person',
-    'lbl-api-hdr':'🔑 AI API Key (OpenRouter)','lbl-api-info':'Free AI — get key at openrouter.ai',
-    'lbl-save-api-btn':'Save API Key','lbl-sheets-hdr':'📊 Google Sheets','lbl-sheets-btn':'🔗 Connect',
-    'lbl-data-hdr':'⚠️ Data','lbl-export-btn':'📤 Export JSON','lbl-sample-btn':'🎯 Load sample data',
-    'lbl-sync-btn':'🔄 Sync to Sheets','lbl-reset-btn':'⚠️ Reset All Data',
-    'nav-home':'Home','nav-entry':'Entry','nav-dispatch':'Dispatch','nav-bills':'Bills','nav-ai':'AI','nav-setup':'Setup',
-    chips:['📄 Monthly bill','🐄 Top animal','💰 Outstanding','💵 Cash this month','📊 Month total','🏭 Bulk vs Retail'],
-    chipsQ:['Generate bill for all clients this month','Which animal gave most milk today?','Show outstanding payments for all clients','Total cash collected this month','Total milk produced this month','Compare bulk vs retail billing this month']
-  },
-  hi:{
-    'lbl-home-hdr':'आज का सारांश','lbl-h-total':'आज का कुल दूध','lbl-h-sess':'सत्र दर्ज',
-    'lbl-h-cow':'गाय का दूध','lbl-h-buf':'भैंस का दूध','lbl-morning':'🌅 सुबह का सत्र',
-    'lbl-evening':'🌇 शाम का सत्र','lbl-record-btn':'➕ दूध सत्र दर्ज करें',
-    'lbl-entry-hdr':'दूध सत्र दर्ज करें','lbl-date':'तारीख','lbl-person':'दूध देने वाला',
-    'lbl-s-morn':'सुबह','lbl-s-eve':'शाम',
-    'lbl-session-fat':'📊 सत्र वसा% रीडिंग (दुहाई के बाद)',
-    'lbl-cow-fat-lbl':'गाय वसा%','lbl-buf-fat-lbl':'भैंस वसा%',
-    'lbl-cow-entries':'गाय — मात्रा (L)','lbl-buf-entries':'भैंस — मात्रा (L)',
-    'lbl-add-cow':'+ गाय जोड़ें','lbl-add-buf':'+ भैंस जोड़ें','lbl-save-sess':'✅ सत्र सहेजें',
-    'lbl-dispatch-hdr':'ग्राहक वितरण','lbl-dispatch-card':'📋 वितरण दर्ज करें','lbl-d-date':'तारीख',
-    'lbl-d-morn':'सुबह','lbl-d-eve':'शाम','lbl-save-dispatch':'✅ वितरण सहेजें',
-    'lbl-client-list':'👥 ग्राहक','lbl-add-client-btn':'+ नया ग्राहक जोड़ें','lbl-add-client-hdr':'ग्राहक जोड़ें',
-    'lbl-cl-name':'नाम','lbl-cl-phone':'फोन','lbl-cl-type-hdr':'ग्राहक प्रकार',
-    'lbl-bulk-info':'थोक ग्राहक गाय+भैंस मिश्रित दूध लेते हैं। बिल वसा% से सहकारी दर पर।',
-    'lbl-retail-info':'खुदरा ग्राहकों को प्रति लीटर सीधी दर से बिल। वसा% जरूरी नहीं।',
-    'lbl-cl-qty':'दैनिक मात्रा (L)','lbl-add-cl-submit':'ग्राहक जोड़ें',
-    'lbl-billing-hdr':'मासिक बिलिंग','lbl-gen-bill':'📅 बिल बनाएं',
-    'lbl-b-client':'ग्राहक','lbl-all-clients':'सभी ग्राहक','lbl-b-month':'माह',
-    'lbl-gen-bill-btn':'🧾 बिल बनाएं',
-    'lbl-fat-rate-hdr':'⚙️ वसा दर तालिका (सहकारी)','lbl-fat-rate-info':'थोक बिलिंग के लिए: वसा% → ₹/L',
-    'lbl-ft-type':'प्रकार','lbl-ft-fat':'वसा%','lbl-ft-rate':'₹/L','lbl-add-rate-btn':'+ जोड़ें',
-    'lbl-ai-hdr':'🤖 AI सहायक','lbl-ai-welcome':'नमस्ते! 🙏 कुछ भी पूछें — बिल, वसा, नकद, बकाया, उत्पादन!',
-    'lbl-setup-hdr':'सेटअप',
-    'lbl-coop-rates-hdr':'सहकारी दरें (थोक बिलिंग)',
-    'lbl-coop-rates-info':'थोक/सहकारी ग्राहकों के लिए — वसा% से दर। दूध संघ की दर तालिका दर्ज करें।',
-    'lbl-add-coop-btn':'+ सहकारी दर जोड़ें',
-    'lbl-retail-rates-hdr':'खुदरा दरें (डिफ़ॉल्ट ₹/L)',
-    'lbl-retail-rates-info':'खुदरा ग्राहकों के लिए — प्रति लीटर निश्चित दर।',
-    'lbl-save-retail-btn':'सेव',
-    'lbl-fy-hdr':'वित्तीय वर्ष','lbl-fy-current':'वर्तमान:','lbl-fy-start':'शुरू:',
-    'lbl-fy-sess':'सत्र:','lbl-fy-disp':'डिस्पैच:',
-    'lbl-fy-archive-btn':'📦 आर्काइव और नया वर्ष','lbl-fy-view-btn':'📜 पुराना देखें',
-    'lbl-animals-hdr':'🐄 पशु','lbl-add-animal-btn':'+ पशु जोड़ें',
-    'lbl-persons-hdr':'👤 दूध देने वाले','lbl-add-person-btn':'+ व्यक्ति जोड़ें',
-    'lbl-api-hdr':'🔑 AI कुंजी (OpenRouter)','lbl-api-info':'मुफ्त AI — openrouter.ai पर कुंजी लें',
-    'lbl-save-api-btn':'API Key सहेजें','lbl-sheets-hdr':'📊 Google Sheets','lbl-sheets-btn':'🔗 कनेक्ट',
-    'lbl-data-hdr':'⚠️ डेटा','lbl-export-btn':'📤 JSON निर्यात','lbl-sample-btn':'🎯 नमूना डेटा',
-    'lbl-sync-btn':'🔄 Sheets सिंक','lbl-reset-btn':'⚠️ सब रीसेट करें',
-    'nav-home':'होम','nav-entry':'प्रविष्टि','nav-dispatch':'वितरण','nav-bills':'बिल','nav-ai':'AI','nav-setup':'सेटअप',
-    chips:['📄 मासिक बिल','🐄 सर्वश्रेष्ठ पशु','💰 बकाया','💵 नकद','📊 महीने का कुल','🏭 थोक बनाम खुदरा'],
-    chipsQ:['इस महीने सभी ग्राहकों का बिल बनाओ','आज किस पशु ने सबसे ज्यादा दूध दिया?','सभी ग्राहकों का बकाया दिखाओ','इस महीने कुल नकद कितना मिला?','इस महीने कुल कितना दूध उत्पादन हुआ?','थोक और खुदरा बिलिंग की तुलना करो']
-  }
-};
-
-function setLanguage(lang){
-  currentLang=lang;
-  localStorage.setItem('dairy_lang',lang);
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector(`.lang-btn[onclick="setLanguage('${lang}')"]`).classList.add('active');
-  const tr=T[lang];
-  Object.keys(tr).forEach(id=>{if(id==='chips'||id==='chipsQ')return;const el=document.getElementById(id);if(el)el.textContent=tr[id];});
-  const chipRow=document.getElementById('quick-chips');
-  chipRow.innerHTML=tr.chips.map((c,i)=>`<span class="chip" onclick="askAI(decodeURIComponent('${encodeURIComponent(tr.chipsQ[i])}'))">${c}</span>`).join('');
-  document.getElementById('chat-input').placeholder=lang==='hi'?'कुछ भी पूछें...':'Ask anything...';
-  updateFiscalYearDisplay();
-}
-
-// ══════════════════════════════════════════
-//  DATABASE
-// ══════════════════════════════════════════
-let googleSheetsUrl=localStorage.getItem('google_sheets_url')||'';
-const DB={get:k=>{try{return JSON.parse(localStorage.getItem('dairy_'+k))||[];}catch(e){return[];}},set:(k,v)=>localStorage.setItem('dairy_'+k,JSON.stringify(v)),getObj:k=>{try{return JSON.parse(localStorage.getItem('dairy_'+k))||{};}catch(e){return{};}},setObj:(k,v)=>localStorage.setItem('dairy_'+k,JSON.stringify(v))};
-const getAnimals=()=>DB.get('animals');
-const getPersons=()=>DB.get('persons');
-const getClients=()=>DB.get('clients');
-const getSessions=()=>DB.get('sessions');
-const getDispatches=()=>DB.get('dispatches');
-const getFatRates=()=>DB.get('fat_rates');
-const getRetailRates=()=>DB.getObj('retail_rates');
-const getApiKey=()=>localStorage.getItem('openrouter_api_key')||'';
-const saveAnimals=v=>DB.set('animals',v);
-const savePersons=v=>DB.set('persons',v);
-const saveClients=v=>DB.set('clients',v);
-const saveSessions=v=>DB.set('sessions',v);
-const saveDispatches=v=>DB.set('dispatches',v);
-const saveFatRates=v=>DB.set('fat_rates',v);
-const saveRetailRates=v=>DB.setObj('retail_rates',v);
-
-async function syncToSheets(){if(!googleSheetsUrl)return;const d={animals:getAnimals(),persons:getPersons(),clients:getClients(),sessions:getSessions(),dispatches:getDispatches(),fat_rates:getFatRates(),retail_rates:getRetailRates(),timestamp:new Date().toISOString()};try{await fetch(googleSheetsUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});toast(currentLang==='hi'?'✅ सिंक शुरू':'✅ Sync initiated');}catch(e){toast('❌ Sync failed');}}
-function saveSheetsUrl(){const u=document.getElementById('sheets-script-url').value.trim();if(u){localStorage.setItem('google_sheets_url',u);googleSheetsUrl=u;document.getElementById('sheets-status').textContent='✅ '+(currentLang==='hi'?'कनेक्टेड':'Connected');}}
-
-// ══════════════════════════════════════════
-//  COOPERATIVE RATES
-// ══════════════════════════════════════════
-function addCoopRate(){const type=document.getElementById('cr-type').value,fat=parseFloat(document.getElementById('cr-fat').value),rate=parseFloat(document.getElementById('cr-rate').value);if(!fat||!rate){toast(currentLang==='hi'?'वसा% और दर दर्ज करें':'Enter fat% and rate');return;}const rates=getFatRates();rates.push({id:genId(),milk_type:type,fat,rate});saveFatRates(rates.sort((a,b)=>a.fat-b.fat));document.getElementById('cr-fat').value='';document.getElementById('cr-rate').value='';renderCoopRates();renderFatRateTable();toast(currentLang==='hi'?'दर जोड़ी गई':'Rate added');syncToSheets();}
-function deleteCoopRate(id){saveFatRates(getFatRates().filter(r=>r.id!==id));renderCoopRates();renderFatRateTable();}
-function getCoopRate(milkType,fat){const rates=getFatRates().filter(r=>r.milk_type===milkType).sort((a,b)=>a.fat-b.fat);if(!rates.length)return 0;for(let r of rates){if(fat<=r.fat)return r.rate;}return rates[rates.length-1].rate;}
-function renderCoopRates(){const rates=getFatRates();const el=document.getElementById('coop-rates-display');if(!el)return;if(!rates.length){el.innerHTML=`<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${currentLang==='hi'?'कोई सहकारी दर नहीं':'No cooperative rates yet'}</div>`;return;}el.innerHTML=`<table class="mini-table" style="margin-bottom:8px"><thead><tr><th>${currentLang==='hi'?'प्रकार':'Type'}</th><th>${currentLang==='hi'?'वसा%':'Fat%'}</th><th>₹/L</th><th></th></tr></thead><tbody>`+rates.map(r=>`<tr><td><span class="badge ${r.milk_type==='cow'?'badge-cow':r.milk_type==='buffalo'?'badge-buffalo':'badge-mix'}">${r.milk_type}</span></td><td>${r.fat}%</td><td>₹${r.rate}</td><td><button class="btn btn-outline btn-sm" onclick="deleteCoopRate('${r.id}')">✕</button></td>`).join('')+`</tbody></table>`;}
-function renderFatRateTable(){document.getElementById('fat-rate-body').innerHTML=getFatRates().map(r=>`<tr><td><span class="badge ${r.milk_type==='cow'?'badge-cow':r.milk_type==='buffalo'?'badge-buffalo':'badge-mix'}">${r.milk_type}</span></td><td>${r.fat}%</td><td>₹${r.rate}</td><td><button class="btn btn-outline btn-sm" onclick="deleteCoopRate('${r.id}')">✕</button></td>`).join('')||`<tr><td colspan="4" style="color:var(--text-soft);font-size:12px;padding:8px">${currentLang==='hi'?'कोई दर नहीं':'No rates yet'}</td></tr>`;}
-function addFatRate(){const type=document.getElementById('fr-type').value,fat=parseFloat(document.getElementById('fr-fat').value),rate=parseFloat(document.getElementById('fr-rate').value);if(!fat||!rate){toast(currentLang==='hi'?'दर्ज करें':'Enter values');return;}const rates=getFatRates();rates.push({id:genId(),milk_type:type,fat,rate});saveFatRates(rates.sort((a,b)=>a.fat-b.fat));document.getElementById('fr-fat').value='';document.getElementById('fr-rate').value='';renderFatRateTable();renderCoopRates();toast(currentLang==='hi'?'दर जोड़ी':'Rate added');syncToSheets();}
-
-// ══════════════════════════════════════════
-//  RETAIL RATES
-// ══════════════════════════════════════════
-function saveRetailRate(){const type=document.getElementById('rr-type').value,rate=parseFloat(document.getElementById('rr-rate').value);if(!rate){toast(currentLang==='hi'?'दर दर्ज करें':'Enter rate');return;}const rates=getRetailRates();rates[type]=rate;saveRetailRates(rates);document.getElementById('rr-rate').value='';renderRetailRates();toast(currentLang==='hi'?'✅ खुदरा दर सेव हुई':'✅ Retail rate saved');syncToSheets();}
-function editRetailRate(type,cur){const v=prompt((currentLang==='hi'?'नई दर (₹/L):':'New rate (₹/L):'),cur);if(v===null)return;const rate=parseFloat(v);if(!rate){toast(currentLang==='hi'?'मान्य दर दर्ज करें':'Invalid rate');return;}const rates=getRetailRates();rates[type]=rate;saveRetailRates(rates);renderRetailRates();toast(currentLang==='hi'?'✅ दर अपडेट':'✅ Rate updated');}
-function renderRetailRates(){const rates=getRetailRates();const el=document.getElementById('retail-rates-display');if(!el)return;const types=[{k:'cow',lbl:'🐄 Cow / गाय'},{k:'buffalo',lbl:'🐃 Buffalo / भैंस'}];el.innerHTML=types.map(t=>{const r=rates[t.k]||0;return `<div class="default-rate-box"><div class="default-rate-label">${t.lbl}</div><div style="display:flex;align-items:center;gap:10px"><div style="font-family:var(--font-head);font-size:16px;color:var(--amber);font-weight:700">${r?'₹'+r+'/L':(currentLang==='hi'?'सेट नहीं':'Not set')}</div><button class="btn btn-outline btn-sm" onclick="editRetailRate('${t.k}','${r}')">${currentLang==='hi'?'बदलें':'Edit'}</button></div></div>`;}).join('');}
-
-// ══════════════════════════════════════════
-//  HELPERS
-// ══════════════════════════════════════════
-function milkTypeBadgeClass(t){return t==='cow'?'badge-cow':t==='buffalo'?'badge-buffalo':'badge-mix';}
-function milkTypeLabel(t){if(currentLang==='hi')return t==='cow'?'गाय':t==='buffalo'?'भैंस':'मिश्रित';return t;}
-function getSessionFat(date,session,milkType){const sess=getSessions().find(s=>s.date===date && s.session===session && s.milkType===milkType);return sess?(sess.fat||0):0;}
-function today(){return new Date().toISOString().split('T')[0];}
-function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-function nowTime(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});}
-
-// ══════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════
-let currentSession='morning', currentDispatchSession='morning', currentScreen='home';
-
-function goTo(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  const idx=['home','entry','clients','billing','ai','setup'].indexOf(name);
-  if(idx>=0)document.querySelectorAll('.bnav-item')[idx].classList.add('active');
-  currentScreen=name;
-  if(name==='home')renderHome();
-  if(name==='entry')renderEntryScreen();
-  if(name==='clients')renderClientsScreen();
-  if(name==='billing')renderBillingScreen();
-  if(name==='setup'){renderSetupScreen();updateFiscalYearDisplay();}
-}
-
-// ══════════════════════════════════════════
-//  HOME
-// ══════════════════════════════════════════
-function renderHome(){
-  const td=today();
-  const sessions=getSessions().filter(s=>s.date===td);
-  const total=sessions.reduce((a,s)=>a+parseFloat(s.totalQty||0),0);
-  const cow=sessions.filter(s=>s.milkType==='cow').reduce((a,s)=>a+parseFloat(s.totalQty||0),0);
-  const buf=sessions.filter(s=>s.milkType==='buffalo').reduce((a,s)=>a+parseFloat(s.totalQty||0),0);
-  document.getElementById('h-total').textContent=total.toFixed(1)+' L';
-  document.getElementById('h-sessions').textContent=sessions.length;
-  document.getElementById('h-cow').textContent=cow.toFixed(1)+' L';
-  document.getElementById('h-buf').textContent=buf.toFixed(1)+' L';
-
-  const morningCow=getSessionFat(td,'morning','cow');
-  const morningBuf=getSessionFat(td,'morning','buffalo');
-  const eveningCow=getSessionFat(td,'evening','cow');
-  const eveningBuf=getSessionFat(td,'evening','buffalo');
-  const lbl=currentLang==='hi';
-  let banner='';
-  if(morningCow||morningBuf||eveningCow||eveningBuf){
-    banner=`<div style="background:var(--amber-pale);border:1px solid var(--amber);border-radius:10px;padding:10px 13px;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:600;color:var(--amber);margin-bottom:6px">📊 ${lbl?'आज की वसा% (सत्रवार)':'Today\'s Fat% (per session)'}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px">
-        <div>🌅 ${lbl?'सुबह':'Morning'}: 🐄${morningCow?morningCow.toFixed(1)+'%':'—'} 🐃${morningBuf?morningBuf.toFixed(1)+'%':'—'}</div>
-        <div>🌇 ${lbl?'शाम':'Evening'}: 🐄${eveningCow?eveningCow.toFixed(1)+'%':'—'} 🐃${eveningBuf?eveningBuf.toFixed(1)+'%':'—'}</div>
+  <!-- SCREEN 2: DISPATCH -->
+  <main class="screen" id="screen-dispatch">
+    <div class="card">
+      <h2 id="lbl-dairy-dispatch">Dairy Factory Dispatch</h2>
+      <div class="form-group">
+        <label id="lbl-disp-date">Dispatch Date</label>
+        <input type="date" id="dispatch-date">
       </div>
-    </div>`;
-  }
-  document.getElementById('home-fat-banner').innerHTML=banner;
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="btn-d-morn" onclick="setDispatchSession('morning')">🌅 <span id="lbl-d-morn-txt">Morning</span></button>
+        <button class="toggle-btn" id="btn-d-eve" onclick="setDispatchSession('evening')">🌃 <span id="lbl-d-eve-txt">Evening</span></button>
+      </div>
 
-  function rList(sessionList,elId){
-    const el=document.getElementById(elId);
-    if(!sessionList.length){el.innerHTML=`<div style="font-size:13px;color:var(--text-soft)">${lbl?'कोई प्रविष्टि नहीं':'No entries yet'}</div>`;return;}
-    el.innerHTML=sessionList.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)"><div><span class="badge ${milkTypeBadgeClass(s.milkType)}" style="margin-right:6px">${milkTypeLabel(s.milkType)}</span><span style="font-size:12px;color:var(--text-soft)">${lbl?'वसा':'Fat'}: <strong>${s.fat?s.fat+'%':'—'}</strong> · ${s.person||'—'}</span></div><strong style="font-family:var(--font-head)">${parseFloat(s.totalQty||0).toFixed(1)} L</strong></div>`).join('');
-  }
-  rList(sessions.filter(s=>s.session==='morning'),'home-morning-list');
-  rList(sessions.filter(s=>s.session==='evening'),'home-evening-list');
-}
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-disp-liters">Total Factory Liters</label>
+          <input type="number" step="0.1" id="disp-liters" placeholder="0.0">
+        </div>
+        <div class="form-group">
+          <label id="lbl-disp-fat">Factory Average Fat</label>
+          <input type="number" step="0.1" id="disp-fat" placeholder="0.0">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label id="lbl-disp-rate">Factory Pay Rate (per 10 Fat) (₹)</label>
+        <input type="number" step="0.1" id="disp-rate" placeholder="e.g. 105">
+      </div>
 
-// ══════════════════════════════════════════
-//  ENTRY
-// ══════════════════════════════════════════
-let extraCows=[], extraBufs=[];
-function renderEntryScreen(){
-  document.getElementById('entry-date').value=today();
-  const persons=getPersons();
-  document.getElementById('entry-person').innerHTML=`<option value="">${currentLang==='hi'?'-- व्यक्ति चुनें --':'-- Select person --'}</option>`+persons.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
-  extraCows=[];extraBufs=[];
-  renderAnimalRows();
-  onEntryDateChange();
-}
-function onEntryDateChange(){
-  const date=document.getElementById('entry-date').value||today();
-  const morningCow=getSessionFat(date,'morning','cow');
-  const morningBuf=getSessionFat(date,'morning','buffalo');
-  const eveningCow=getSessionFat(date,'evening','cow');
-  const eveningBuf=getSessionFat(date,'evening','buffalo');
-  const lbl=currentLang==='hi';
-  const el=document.getElementById('fat-calc-result');
-  if(morningCow||morningBuf||eveningCow||eveningBuf){
-    el.innerHTML=`${lbl?'पहले से दर्ज:':'Previously recorded:'} 🌅 ${lbl?'सुबह':'Morning'} 🐄${morningCow?morningCow+'%':'—'} 🐃${morningBuf?morningBuf+'%':'—'} &nbsp;|&nbsp; 🌇 ${lbl?'शाम':'Evening'} 🐄${eveningCow?eveningCow+'%':'—'} 🐃${eveningBuf?eveningBuf+'%':'—'}`;
-  } else { el.innerHTML=''; }
-}
-function setSession(s){
-  currentSession=s;
-  document.getElementById('btn-morning').classList.toggle('active',s==='morning');
-  document.getElementById('btn-evening').classList.toggle('active',s==='evening');
-  const date=document.getElementById('entry-date').value||today();
-  const existCow=getSessionFat(date,s,'cow');
-  const existBuf=getSessionFat(date,s,'buffalo');
-  document.getElementById('session-cow-fat').value=existCow||'';
-  document.getElementById('session-buf-fat').value=existBuf||'';
-  onFatInput();
-}
-function onFatInput(){
-  const cowFat=parseFloat(document.getElementById('session-cow-fat').value)||0;
-  const bufFat=parseFloat(document.getElementById('session-buf-fat').value)||0;
-  const lbl=currentLang==='hi';
-  let info='';
-  if(cowFat){const r=getCoopRate('cow',cowFat);info+=`🐄 ${lbl?'गाय':'Cow'} ${cowFat}% → ${r?'₹'+r+'/L':'—'} &nbsp;`;}
-  if(bufFat){const r=getCoopRate('buffalo',bufFat);info+=`🐃 ${lbl?'भैंस':'Buffalo'} ${bufFat}% → ${r?'₹'+r+'/L':'—'}`;}
-  document.getElementById('fat-calc-result').innerHTML=info;
-}
-function renderAnimalRows(){
-  const animals=getAnimals();
-  renderRows([...animals.filter(a=>a.type==='cow'),...extraCows],'cow-entries','cow');
-  renderRows([...animals.filter(a=>a.type==='buffalo'),...extraBufs],'buffalo-entries','buffalo');
-}
-function renderRows(animals,containerId,type){
-  const el=document.getElementById(containerId);
-  const lbl=currentLang==='hi';
-  if(!animals.length){el.innerHTML=`<div style="font-size:12px;color:var(--text-soft);padding:4px 0">${lbl?'कोई '+(type==='cow'?'गाय':'भैंस')+' नहीं। सेटअप में जाएं।':'No '+type+' added. Go to Setup.'}</div>`;return;}
-  el.innerHTML=animals.map(a=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="font-size:13px;font-weight:600;min-width:80px">${a.name}</div><input type="number" class="form-input" id="qty-${type}-${a.id}" placeholder="${lbl?'लीटर':'Litres'}" step="0.1"></div>`).join('');
-}
-function addAnimalRow(type){
-  const name=prompt(currentLang==='hi'?'पशु का नाम:':'Animal name:');
-  if(!name)return;
-  const id='tmp_'+genId();
-  if(type==='cow')extraCows.push({id,name,type:'cow'});
-  else extraBufs.push({id,name,type:'buffalo'});
-  renderAnimalRows();
-}
-function saveSession(){
-  const date=document.getElementById('entry-date').value;
-  const personId=document.getElementById('entry-person').value;
-  const person=getPersons().find(p=>p.id===personId);
-  if(!date){toast(currentLang==='hi'?'तारीख चुनें':'Select date');return;}
-  const cowFat=parseFloat(document.getElementById('session-cow-fat').value)||0;
-  const bufFat=parseFloat(document.getElementById('session-buf-fat').value)||0;
-  const animals=getAnimals();
-  const allCows=[...animals.filter(a=>a.type==='cow'),...extraCows];
-  const allBufs=[...animals.filter(a=>a.type==='buffalo'),...extraBufs];
-  let newSessions=[];
-  const cowEntries=allCows.map(a=>({animal_id:a.id,name:a.name,qty:parseFloat(document.getElementById('qty-cow-'+a.id)?.value||0)})).filter(e=>e.qty>0);
-  const cowTotal=cowEntries.reduce((a,e)=>a+e.qty,0);
-  if(cowTotal>0){newSessions.push({id:genId(),date,session:currentSession,milkType:'cow',fat:cowFat,totalQty:cowTotal,entries:cowEntries,person_id:personId,person:person?.name||''});}
-  const bufEntries=allBufs.map(a=>({animal_id:a.id,name:a.name,qty:parseFloat(document.getElementById('qty-buffalo-'+a.id)?.value||0)})).filter(e=>e.qty>0);
-  const bufTotal=bufEntries.reduce((a,e)=>a+e.qty,0);
-  if(bufTotal>0){newSessions.push({id:genId(),date,session:currentSession,milkType:'buffalo',fat:bufFat,totalQty:bufTotal,entries:bufEntries,person_id:personId,person:person?.name||''});}
-  if(!newSessions.length){toast(currentLang==='hi'?'कम से कम एक मात्रा > 0 दर्ज करें':'Enter at least one qty > 0');return;}
-  const existing=getSessions().filter(s=>{
-    if(s.date===date && s.session===currentSession){
-      return !newSessions.some(n=>n.milkType===s.milkType);
-    }
-    return true;
-  });
-  saveSessions([...existing,...newSessions]);
-  extraCows=[];extraBufs=[];
-  toast(currentLang==='hi'?`✅ सत्र सहेजा! 🐄${cowTotal.toFixed(1)}L 🐃${bufTotal.toFixed(1)}L`:`✅ Session saved! 🐄${cowTotal.toFixed(1)}L 🐃${bufTotal.toFixed(1)}L`);
-  renderEntryScreen();syncToSheets();
-}
+      <button class="btn btn-success" id="btn-save-dispatch" onclick="saveDispatchRecord()">Save Factory Dispatch</button>
+    </div>
+  </main>
 
-// ══════════════════════════════════════════
-//  CLIENT TYPE TOGGLE & DISPATCH
-// ══════════════════════════════════════════
-function setClientTypeUI(type){
-  document.getElementById('cl-client-type').value=type;
-  document.getElementById('cl-type-bulk').classList.toggle('active',type==='bulk');
-  document.getElementById('cl-type-bulk').classList.toggle('bulk',type==='bulk');
-  document.getElementById('cl-type-retail').classList.toggle('active',type==='retail');
-  document.getElementById('cl-type-retail').classList.toggle('retail',type==='retail');
-  document.getElementById('bulk-milk-info').style.display=type==='bulk'?'block':'none';
-  document.getElementById('retail-milk-row').style.display=type==='retail'?'block':'none';
-}
-function renderClientsScreen(){
-  document.getElementById('dispatch-date').value=today();
-  onDispatchDateChange();
-  renderClientList();
-}
-function setDispatchSession(s){
-  currentDispatchSession=s;
-  document.getElementById('btn-d-morn').classList.toggle('active',s==='morning');
-  document.getElementById('btn-d-eve').classList.toggle('active',s==='evening');
-  onDispatchDateChange();
-}
-function onDispatchDateChange(){
-  const date=document.getElementById('dispatch-date').value||today();
-  const morningCow=getSessionFat(date,'morning','cow');
-  const morningBuf=getSessionFat(date,'morning','buffalo');
-  const eveningCow=getSessionFat(date,'evening','cow');
-  const eveningBuf=getSessionFat(date,'evening','buffalo');
-  const lbl=currentLang==='hi';
-  const el=document.getElementById('dispatch-fat-info');
-  if(el){
-    if(morningCow||morningBuf||eveningCow||eveningBuf){
-      el.innerHTML=`<div style="background:var(--amber-pale);border:1px solid var(--amber);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px">📊 <strong>${lbl?'वसा% रिकॉर्ड:':'Fat% on record:'}</strong> 🌅 🐄${morningCow?morningCow+'%':'—'} 🐃${morningBuf?morningBuf+'%':'—'} &nbsp;|&nbsp; 🌇 🐄${eveningCow?eveningCow+'%':'—'} 🐃${eveningBuf?eveningBuf+'%':'—'}</div>`;
-    } else {
-      el.innerHTML=`<div style="background:var(--red-pale);border:1px solid var(--red);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--red)">⚠️ ${lbl?'इस तारीख के लिए वसा% दर्ज नहीं। पहले Entry करें।':'No fat% recorded for this date. Please record milk entry first.'}</div>`;
-    }
-  }
-  renderDispatchRows(date);
-}
-function renderDispatchRows(date){
-  date=date||document.getElementById('dispatch-date').value||today();
-  const clients=getClients();
-  const el=document.getElementById('dispatch-client-rows');
-  const lbl=currentLang==='hi';
-  if(!clients.length){el.innerHTML=`<div style="font-size:13px;color:var(--text-soft);padding:4px 0">${lbl?'कोई ग्राहक नहीं':'No clients added yet'}</div>`;return;}
-  const retailRates=getRetailRates();
-  el.innerHTML=clients.map(c=>{
-    const isBulk=c.clientType==='bulk';
-    const milkType=isBulk?'mix':c.milkType;
-    let autoFat=0, autoRate=0;
-    if(isBulk){
-      const sessCow=getSessions().find(s=>s.date===date && s.session===currentDispatchSession && s.milkType==='cow');
-      const sessBuf=getSessions().find(s=>s.date===date && s.session===currentDispatchSession && s.milkType==='buffalo');
-      const cowQty=sessCow?.totalQty||0, bufQty=sessBuf?.totalQty||0;
-      const cowFat=sessCow?.fat||0, bufFat=sessBuf?.fat||0;
-      const totalQty=cowQty+bufQty;
-      autoFat=totalQty>0?((cowFat*cowQty+bufFat*bufQty)/totalQty):0;
-      if(autoFat>0){autoRate=getCoopRate('mix',autoFat);if(!autoRate)autoRate=getCoopRate('cow',autoFat);}
-    } else {
-      autoRate=retailRates[c.milkType]||0;
-    }
-    return `<div class="dispatch-client-card ${isBulk?'bulk':'retail'}">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:14px">${c.name}</span><div style="display:flex;gap:4px"><span class="badge ${isBulk?'badge-bulk':'badge-retail'}">${isBulk?(lbl?'थोक':'Bulk'):(lbl?'खुदरा':'Retail')}</span><span class="badge ${milkTypeBadgeClass(milkType)}">${milkTypeLabel(milkType)}</span></div></div>
-      <div class="${isBulk?'form-grid3':'form-grid'}"><div><div class="form-label">${lbl?'मात्रा (L)':'Qty (L)'}</div><input type="number" class="form-input" id="d-qty-${c.id}" step="0.1" value="${c.daily_qty}"></div>
-      ${isBulk?`<div><div class="form-label">Fat% <span style="font-size:10px;color:var(--green)">(${lbl?'स्वतः':'auto'})</span></div><input type="number" class="form-input" id="d-fat-${c.id}" step="0.1" value="${autoFat>0?autoFat.toFixed(1):''}" oninput="onDispatchFatChange('${c.id}')"></div>
-      <div><div class="form-label">Rate ₹/L <span style="font-size:10px;color:var(--green)">(${lbl?'स्वतः':'auto'})</span></div><input type="number" class="form-input" id="d-rate-${c.id}" step="0.5" value="${autoRate||''}"></div>`:`<div><div class="form-label">${lbl?'दर ₹/L':'Rate ₹/L'}</div><input type="number" class="form-input" id="d-rate-${c.id}" step="0.5" value="${autoRate||''}"></div>`}</div>
-      <div class="cash-row"><span style="font-size:12px;color:var(--text-soft)">${lbl?'भुगतान:':'Payment:'}</span><div class="cash-toggle"><button id="pay-cr-${c.id}" onclick="setPayMode('${c.id}','credit')" class="active">${lbl?'उधार':'Credit'}</button><button id="pay-cs-${c.id}" onclick="setPayMode('${c.id}','cash')">💵 ${lbl?'नकद':'Cash'}</button></div><input type="number" class="form-input" id="d-cash-${c.id}" placeholder="${lbl?'नकद राशि':'Cash amt'}" step="1" style="width:90px;display:none"></div>
-    </div>`;
-  }).join('');
-}
-function onDispatchFatChange(clientId){
-  const fat=parseFloat(document.getElementById('d-fat-'+clientId).value)||0;
-  if(fat>0){const rate=getCoopRate('mix',fat);if(rate)document.getElementById('d-rate-'+clientId).value=rate;}
-}
-function setPayMode(clientId,mode){
-  const cr=document.getElementById('pay-cr-'+clientId);
-  const cs=document.getElementById('pay-cs-'+clientId);
-  if(cr)cr.classList.toggle('active',mode==='credit');
-  if(cs)cs.classList.toggle('active',mode==='cash');
-  const cashField=document.getElementById('d-cash-'+clientId);
-  if(cashField)cashField.style.display=mode==='cash'?'inline-block':'none';
-}
-function saveDispatch(){
-  const date=document.getElementById('dispatch-date').value;
-  if(!date){toast(currentLang==='hi'?'तारीख चुनें':'Select date');return;}
-  let entries=[];
-  getClients().forEach(c=>{
-    const qty=parseFloat(document.getElementById('d-qty-'+c.id)?.value||0);
-    if(qty<=0)return;
-    const isBulk=c.clientType==='bulk';
-    const fat=isBulk?(parseFloat(document.getElementById('d-fat-'+c.id)?.value||0)):0;
-    const rate=parseFloat(document.getElementById('d-rate-'+c.id)?.value||0);
-    const isCash=document.getElementById('pay-cs-'+c.id)?.classList.contains('active');
-    const cashAmt=isCash?parseFloat(document.getElementById('d-cash-'+c.id)?.value||0):0;
-    entries.push({id:genId(),date,session:currentDispatchSession,client_id:c.id,client_name:c.name,clientType:c.clientType||'retail',milk_type:isBulk?'mix':c.milkType,qty,fat,rate_per_litre:rate,payment_mode:isCash?'cash':'credit',cash_received:cashAmt});
-  });
-  if(!entries.length){toast(currentLang==='hi'?'मात्रा दर्ज करें':'Enter qty');return;}
-  saveDispatches([...getDispatches(),...entries]);
-  toast(currentLang==='hi'?`✅ ${entries.length} वितरण सहेजे`:`✅ ${entries.length} dispatches saved`);
-  syncToSheets();
-}
-function renderClientList(){
-  const clients=getClients();const el=document.getElementById('client-list-display');
-  const lbl=currentLang==='hi';
-  el.innerHTML=clients.map(c=>{const isBulk=c.clientType==='bulk';const milkType=isBulk?'mix':c.milkType;return `<div class="list-item"><div class="list-item-left"><div class="list-item-name">${c.name}</div><div class="list-item-sub">${c.phone||'—'} · ${c.daily_qty}L · <span class="badge ${isBulk?'badge-bulk':'badge-retail'}">${isBulk?(lbl?'थोक':'Bulk'):(lbl?'खुदरा':'Retail')}</span> <span class="badge ${milkTypeBadgeClass(milkType)}">${milkTypeLabel(milkType)}</span></div></div><button class="btn btn-outline btn-sm" onclick="deleteClient('${c.id}')">✕</button></div>`;}).join('')||`<div style="font-size:13px;color:var(--text-soft);margin-bottom:10px">${lbl?'कोई ग्राहक नहीं':'No clients yet'}</div>`;
-}
-function showAddClient(){const f=document.getElementById('add-client-form');f.style.display=f.style.display==='none'?'block':'none';}
-function addClient(){
-  const name=document.getElementById('cl-name').value.trim();
-  const phone=document.getElementById('cl-phone').value.trim();
-  const clientType=document.getElementById('cl-client-type').value;
-  const milkType=clientType==='bulk'?'mix':document.getElementById('cl-milk-type').value;
-  const qty=parseFloat(document.getElementById('cl-qty').value);
-  if(!name||!qty){toast(currentLang==='hi'?'नाम और मात्रा दर्ज करें':'Enter name and qty');return;}
-  saveClients([...getClients(),{id:genId(),name,phone,clientType,milkType,daily_qty:qty}]);
-  ['cl-name','cl-phone','cl-qty'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('add-client-form').style.display='none';
-  toast(currentLang==='hi'?'ग्राहक जोड़ा गया':'Client added');
-  renderClientsScreen();syncToSheets();
-}
-function deleteClient(id){if(!confirm(currentLang==='hi'?'हटाएं?':'Remove?'))return;saveClients(getClients().filter(c=>c.id!==id));renderClientsScreen();}
+  <!-- SCREEN 3: FARMERS -->
+  <main class="screen" id="screen-farmers">
+    <div class="card">
+      <h2 id="lbl-manage-farmers">Manage Farmers</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-new-id">New ID</label>
+          <input type="number" id="new-farmer-id" placeholder="ID">
+        </div>
+        <div class="form-group">
+          <label id="lbl-new-name">Farmer Name</label>
+          <input type="text" id="new-farmer-name" placeholder="Name">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-add-farmer" onclick="addFarmerProfile()">Add New Profile</button>
+    </div>
 
-// ══════════════════════════════════════════
-//  BILLING
-// ══════════════════════════════════════════
-function renderBillingScreen(){
-  document.getElementById('bill-month').value=new Date().toISOString().slice(0,7);
-  const sel=document.getElementById('bill-client');
-  sel.innerHTML=`<option value="">${currentLang==='hi'?'सभी ग्राहक':'All clients'}</option>`+getClients().map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  renderFatRateTable();
-}
-function generateBill(){
-  const month=document.getElementById('bill-month').value;
-  const clientId=document.getElementById('bill-client').value;
-  if(!month){toast(currentLang==='hi'?'माह चुनें':'Select month');return;}
-  const dispatches=getDispatches().filter(d=>d.date.startsWith(month));
-  const clients=getClients();
-  const targets=clientId?clients.filter(c=>c.id===clientId):clients;
-  const lbl=currentLang==='hi';
-  let html='';
-  targets.forEach(c=>{
-    const cd=dispatches.filter(d=>d.client_id===c.id);
-    if(!cd.length)return;
-    const isBulk=c.clientType==='bulk';
-    const totalAmt=cd.reduce((a,d)=>a+(parseFloat(d.qty||0)*parseFloat(d.rate_per_litre||0)),0);
-    const totalQty=cd.reduce((a,d)=>a+parseFloat(d.qty||0),0);
-    const cashReceived=cd.filter(d=>d.payment_mode==='cash').reduce((a,d)=>a+parseFloat(d.cash_received||0),0);
-    const outstanding=totalAmt-cashReceived;
-    let billText=`🥛 *DairyBook ${lbl?'बिल':'Bill'}*\n━━━━━━━━━━━━\n${lbl?'ग्राहक':'Client'}: *${c.name}*\n${lbl?'माह':'Month'}: ${month}\n${lbl?'प्रकार':'Type'}: ${isBulk?(lbl?'थोक':'Bulk'):(lbl?'खुदरा':'Retail')}\n${lbl?'दूध':'Milk'}: ${milkTypeLabel(c.milkType||'mix')}\n━━━━━━━━━━━━\n`;
-    billText+=isBulk?`${lbl?'तारीख':'Date'}  ${lbl?'मात्रा':'Qty'}  Fat%  ${lbl?'दर':'Rate'}  ${lbl?'राशि':'Amt'}\n`:`${lbl?'तारीख':'Date'}  ${lbl?'मात्रा':'Qty'}  ${lbl?'दर':'Rate'}  ${lbl?'राशि':'Amt'}\n`;
-    let tableRows='';
-    cd.forEach(d=>{
-      const amt=(parseFloat(d.qty||0)*parseFloat(d.rate_per_litre||0)).toFixed(0);
-      const payBadge=d.payment_mode==='cash'?`<span class="badge badge-cash">💵</span>`:`<span class="badge badge-credit">Cr</span>`;
-      if(isBulk){
-        tableRows+=`<tr><td>${d.date.slice(5)}</td><td>${parseFloat(d.qty).toFixed(1)}L</td><td>${d.fat||'—'}%</td><td>₹${d.rate_per_litre||0}</td><td>₹${amt}</td><td>${payBadge}</td></tr>`;
-        billText+=`${d.date.slice(5)}  ${parseFloat(d.qty).toFixed(1)}L  ${d.fat||0}%  ₹${d.rate_per_litre||0}  ₹${amt}\n`;
-      } else {
-        tableRows+=`<tr><td>${d.date.slice(5)}</td><td>${parseFloat(d.qty).toFixed(1)}L</td><td>₹${d.rate_per_litre||0}</td><td>₹${amt}</td><td>${payBadge}</td></tr>`;
-        billText+=`${d.date.slice(5)}  ${parseFloat(d.qty).toFixed(1)}L  ₹${d.rate_per_litre||0}  ₹${amt}\n`;
+    <div class="card">
+      <h2 id="lbl-farmer-directory">Registered Directory</h2>
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th id="lbl-tbl-name">Name</th>
+          </tr>
+        </thead>
+        <tbody id="table-farmers-body"></tbody>
+       </table>
+    </div>
+  </main>
+
+  <!-- SCREEN 4: BILLING & REPORTS -->
+  <main class="screen" id="screen-billing">
+    <div class="card">
+      <h2 id="lbl-generate-bills">Generate Summary Invoices</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label id="lbl-start-date">Start Date</label>
+          <input type="date" id="bill-start">
+        </div>
+        <div class="form-group">
+          <label id="lbl-end-date">End Date</label>
+          <input type="date" id="bill-end">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-run-bill" onclick="generateBill()">Compile Dynamic Billings</button>
+    </div>
+
+    <div id="billing-results-output"></div>
+  </main>
+
+  <!-- SCREEN 5: AI INTEGRATION LAYER -->
+  <main class="screen" id="screen-ai">
+    <div class="card">
+      <h2 id="lbl-ai-title">AI Profit Analytics</h2>
+      <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;" id="lbl-ai-desc">
+        Generate custom analytical payload prompts based on your inventory margins to feed into an LLM context window.
+      </p>
+      <button class="btn btn-purple" id="btn-build-prompt" onclick="generateAIPayload()">Compile AI Context Data</button>
+    </div>
+
+    <div class="card" id="ai-prompt-box" style="display:none;">
+      <label style="color:var(--purple); font-weight:700;">Copy and Paste Prompt Context into ChatGPT/Gemini:</label>
+      <textarea id="ai-textarea" rows="10" style="font-family:monospace; font-size:12px; margin-top:6px;" readonly></textarea>
+    </div>
+  </main>
+
+  <!-- SCREEN 6: SETUP & SYSTEM DEFAULTS -->
+  <main class="screen" id="screen-setup">
+    <div class="card">
+      <h2 id="lbl-system-setup">System Administration Tools</h2>
+      <p style="font-size:14px; color:var(--text-muted); margin-bottom:14px;" id="lbl-setup-desc">
+        Perform sandbox database routines or reset browser-cached transaction ledgers.
+      </p>
+      <button class="btn btn-success" id="btn-load-demo" onclick="loadSandboxDemoData()">Load Sandbox Demo Records</button>
+      <button class="btn btn-outline-danger" id="btn-clear-db" onclick="wipeLocalDatabase()">Wipe Entire Local Database</button>
+    </div>
+  </main>
+
+  <nav>
+    <button class="nav-item active" id="nav-entry" onclick="switchTab('entry')">
+      <span>📥</span><span id="lbl-nav-entry">Entry</span>
+    </button>
+    <button class="nav-item" id="nav-dispatch" onclick="switchTab('dispatch')">
+      <span>🚚</span><span id="lbl-nav-disp">Dispatch</span>
+    </button>
+    <button class="nav-item" id="nav-farmers" onclick="switchTab('farmers')">
+      <span>👥</span><span id="lbl-nav-farm">Farmers</span>
+    </button>
+    <button class="nav-item" id="nav-billing" onclick="switchTab('billing')">
+      <span>📄</span><span id="lbl-nav-bill">Billing</span>
+    </button>
+    <button class="nav-item" id="nav-ai" onclick="switchTab('ai')">
+      <span>✨</span><span id="lbl-nav-ai">AI Insights</span>
+    </button>
+    <button class="nav-item" id="nav-setup" onclick="switchTab('setup')">
+      <span>⚙️</span><span id="lbl-nav-setup">Setup</span>
+    </button>
+  </nav>
+
+  <script>
+    // ==================== LANGUAGE SYSTEM ====================
+    let lang = localStorage.getItem('dairy_lang') || 'en';
+    
+    const T = {
+      en: {
+        'btn-lang': 'हिंदी',
+        'lbl-session-config': 'Session Configuration',
+        'lbl-date': 'Date',
+        'lbl-morn': 'Morning',
+        'lbl-eve': 'Evening',
+        'lbl-fat-rates': 'Fat Rates (per 10 Fat)',
+        'lbl-cow-fat-rate': 'Cow Fat Rate (₹)',
+        'lbl-buf-fat-rate': 'Buffalo Fat Rate (₹)',
+        'lbl-add-entry': 'Add Farmer Collection Entry',
+        'lbl-farmer-id': 'Farmer ID',
+        'lbl-farmer-name': 'Farmer Name',
+        'lbl-animal-type': 'Animal Type',
+        'opt-cow': 'Cow',
+        'opt-buf': 'Buffalo',
+        'lbl-liters': 'Liters',
+        'lbl-measured-fat': 'Measured Fat',
+        'lbl-total-amt': 'Calculated Amount (₹)',
+        'btn-save-entry': 'Save Data Entry',
+        'lbl-dairy-dispatch': 'Dairy Factory Dispatch',
+        'lbl-disp-date': 'Dispatch Date',
+        'lbl-d-morn-txt': 'Morning',
+        'lbl-d-eve-txt': 'Evening',
+        'lbl-disp-liters': 'Total Factory Liters',
+        'lbl-disp-fat': 'Factory Average Fat',
+        'lbl-disp-rate': 'Factory Pay Rate (per 10 Fat) (₹)',
+        'btn-save-dispatch': 'Save Factory Dispatch',
+        'lbl-manage-farmers': 'Manage Farmers',
+        'lbl-new-id': 'New ID',
+        'lbl-new-name': 'Farmer Name',
+        'btn-add-farmer': 'Add New Profile',
+        'lbl-farmer-directory': 'Registered Directory',
+        'lbl-tbl-name': 'Name',
+        'lbl-generate-bills': 'Generate Summary Invoices',
+        'lbl-start-date': 'Start Date',
+        'lbl-end-date': 'End Date',
+        'btn-run-bill': 'Compile Dynamic Billings',
+        'lbl-ai-title': 'AI Profit Analytics',
+        'lbl-ai-desc': 'Generate custom analytical payload prompts based on your inventory margins to feed into an LLM context window.',
+        'btn-build-prompt': 'Compile AI Context Data',
+        'lbl-system-setup': 'System Administration Tools',
+        'lbl-setup-desc': 'Perform sandbox database routines or reset browser-cached transaction ledgers.',
+        'btn-load-demo': 'Load Sandbox Demo Records',
+        'btn-clear-db': 'Wipe Entire Local Database',
+        'lbl-nav-entry': 'Entry',
+        'lbl-nav-disp': 'Dispatch',
+        'lbl-nav-farm': 'Farmers',
+        'lbl-nav-bill': 'Billing',
+        'lbl-nav-ai': 'AI Insights',
+        'lbl-nav-setup': 'Setup'
+      },
+      hi: {
+        'btn-lang': 'English',
+        'lbl-session-config': 'सत्र कॉन्फ़िगरेशन',
+        'lbl-date': 'तारीख',
+        'lbl-morn': 'सुबह',
+        'lbl-eve': 'शाम',
+        'lbl-fat-rates': 'फैट दरें (प्रति 10 फैट)',
+        'lbl-cow-fat-rate': 'गाय फैट दर (₹)',
+        'lbl-buf-fat-rate': 'भैंस फैट दर (₹)',
+        'lbl-add-entry': 'किसान संग्रह प्रविष्टि जोड़ें',
+        'lbl-farmer-id': 'किसान आईडी',
+        'lbl-farmer-name': 'किसान का नाम',
+        'lbl-animal-type': 'पशु का प्रकार',
+        'opt-cow': 'गाय',
+        'opt-buf': 'भैंस',
+        'lbl-liters': 'लीटर',
+        'lbl-measured-fat': 'मापा गया फैट',
+        'lbl-total-amt': 'कुल राशि (₹)',
+        'btn-save-entry': 'प्रविष्टि सुरक्षित करें',
+        'lbl-dairy-dispatch': 'डेयरी फैक्ट्री डिस्पैच',
+        'lbl-disp-date': 'डिस्पैच तारीख',
+        'lbl-d-morn-txt': 'सुबह',
+        'lbl-d-eve-txt': 'शाम',
+        'lbl-disp-liters': 'कुल फैक्ट्री लीटर',
+        'lbl-disp-fat': 'फैक्ट्री औसत फैट',
+        'lbl-disp-rate': 'फैक्ट्री भुगतान दर (प्रति 10 फैट) (₹)',
+        'btn-save-dispatch': 'फैक्ट्री डिस्पैच सुरक्षित करें',
+        'lbl-manage-farmers': 'किसानों को प्रबंधित करें',
+        'lbl-new-id': 'नई आईडी',
+        'lbl-new-name': 'किसान का नाम',
+        'btn-add-farmer': 'नया प्रोफाइल जोड़ें',
+        'lbl-farmer-directory': 'पंजीकृत डायरेक्टरी',
+        'lbl-tbl-name': 'नाम',
+        'lbl-generate-bills': 'खाता सारांश बिल बनाएं',
+        'lbl-start-date': 'प्रारंभ तिथि',
+        'lbl-end-date': 'अंतिम तिथि',
+        'btn-run-bill': 'बिल संकलित करें',
+        'lbl-ai-title': 'एआई लाभ विश्लेषण',
+        'lbl-ai-desc': 'एक एलएलएम संदर्भ विंडो में फ़ीड करने के लिए अपने इन्वेंट्री मार्जिन के आधार पर कस्टम विश्लेषणात्मक पेलोड प्रॉम्प्ट जेनरेट करें।',
+        'btn-build-prompt': 'एआई संदर्भ डेटा संकलित करें',
+        'lbl-system-setup': 'प्रणाली प्रशासन उपकरण',
+        'lbl-setup-desc': 'सैंडबॉक्स डेटाबेस रूटीन निष्पादित करें या ब्राउज़र-कैश किए गए लेनदेन बही को रीसेट करें।',
+        'btn-load-demo': 'सैंडबॉक्स डेमो रिकॉर्ड लोड करें',
+        'btn-clear-db': 'स्थानीय डेटाबेस साफ करें',
+        'lbl-nav-entry': 'एंट्री',
+        'lbl-nav-disp': 'डिस्पैच',
+        'lbl-nav-farm': 'किसान',
+        'lbl-nav-bill': 'बिलिंग',
+        'lbl-nav-ai': 'एआई विश्लेषण',
+        'lbl-nav-setup': 'सेटअप'
       }
+    };
+
+    function toggleLang() {
+      lang = lang === 'en' ? 'hi' : 'en';
+      localStorage.setItem('dairy_lang', lang);
+      setLanguage();
+    }
+
+    function setLanguage() {
+      const dict = T[lang];
+      for (let key in dict) {
+        const el = document.getElementById(key);
+        if (el) el.textContent = dict[key];
+      }
+      // Update placeholder for AI textarea after language change
+      if (document.getElementById('ai-prompt-box').style.display === 'block') {
+        generateAIPayload();
+      }
+    }
+
+    // ==================== DATABASE ====================
+    let DB = { farmers: {}, rates: {}, entries: [], dispatch: [] };
+
+    function loadLocalStorageEngine() {
+      const stored = localStorage.getItem('dairybook_db_v1');
+      if (stored) {
+        try { DB = JSON.parse(stored); } catch(e) { console.error(e); }
+      }
+      if (!DB.farmers) DB.farmers = {};
+      if (!DB.rates) DB.rates = {};
+      if (!DB.entries) DB.entries = [];
+      if (!DB.dispatch) DB.dispatch = [];
+    }
+
+    function syncStorage() {
+      localStorage.setItem('dairybook_db_v1', JSON.stringify(DB));
+    }
+
+    function today() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    // ==================== TAB NAVIGATION ====================
+    function switchTab(tabId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById(`screen-${tabId}`).classList.add('active');
+      document.getElementById(`nav-${tabId}`).classList.add('active');
+
+      if (tabId === 'farmers') renderFarmersList();
+    }
+
+    // ==================== ENTRY LOGIC ====================
+    let currentSession = 'morning';
+    
+    function setSession(s) {
+      currentSession = s;
+      document.getElementById('btn-morning').classList.toggle('active', s === 'morning');
+      document.getElementById('btn-evening').classList.toggle('active', s === 'evening');
+      onDateOrSessionChange();
+    }
+
+    function onDateOrSessionChange() {
+      const date = document.getElementById('entry-date').value || today();
+      const key = `${date}_${currentSession}`;
+      const sessionConfig = DB.rates[key] || { cow: '', buffalo: '' };
+      
+      document.getElementById('session-cow-fat').value = sessionConfig.cow || '';
+      document.getElementById('session-buf-fat').value = sessionConfig.buffalo || '';
+      
+      onFatInput();
+      clearEntryInputs();
+    }
+
+    function onFatInput() {
+      const date = document.getElementById('entry-date').value || today();
+      const cowRate = parseFloat(document.getElementById('session-cow-fat').value) || 0;
+      const bufRate = parseFloat(document.getElementById('session-buf-fat').value) || 0;
+      
+      const key = `${date}_${currentSession}`;
+      DB.rates[key] = { cow: cowRate, buffalo: bufRate };
+      syncStorage();
+
+      const preview = document.getElementById('rate-calc-preview');
+      if (cowRate > 0 || bufRate > 0) {
+        preview.innerHTML = `<strong>Calculated Yield Formula Reference Matrix:</strong><br>` +
+          `🐄 Cow: 1 Liter @ 4.0 Fat = ₹${((cowRate / 10) * 4).toFixed(2)}<br>` +
+          `🦬 Buffalo: 1 Liter @ 6.5 Fat = ₹${((bufRate / 10) * 6.5).toFixed(2)}`;
+      } else {
+        preview.innerHTML = lang === 'en' ? "Enter session fat rates to preview basic distribution calculation equations." : "बुनियादी वितरण गणना समीकरणों का पूर्वावलोकन करने के लिए सत्र वसा दरें दर्ज करें।";
+      }
+      calculateEntryRow();
+    }
+
+    function onFarmerIdInput() {
+      const id = document.getElementById('entry-id').value;
+      const nameField = document.getElementById('entry-name');
+      if (id && DB.farmers[id]) {
+        nameField.value = DB.farmers[id];
+      } else {
+        nameField.value = '';
+      }
+    }
+
+    function calculateEntryRow() {
+      const type = document.getElementById('entry-type').value;
+      const liters = parseFloat(document.getElementById('entry-liters').value) || 0;
+      const fat = parseFloat(document.getElementById('entry-fat').value) || 0;
+      
+      const date = document.getElementById('entry-date').value || today();
+      const key = `${date}_${currentSession}`;
+      const rates = DB.rates[key] || { cow: 0, buffalo: 0 };
+      
+      const baseRate = type === 'cow' ? (rates.cow || 0) : (rates.buffalo || 0);
+      const calculatedAmount = liters * (baseRate / 10) * fat;
+      
+      document.getElementById('entry-amount').value = calculatedAmount > 0 ? calculatedAmount.toFixed(2) : '0.00';
+    }
+
+    function saveRecordEntry() {
+      const id = document.getElementById('entry-id').value;
+      const date = document.getElementById('entry-date').value || today();
+      const type = document.getElementById('entry-type').value;
+      const liters = parseFloat(document.getElementById('entry-liters').value) || 0;
+      const fat = parseFloat(document.getElementById('entry-fat').value) || 0;
+      const amt = parseFloat(document.getElementById('entry-amount').value) || 0;
+
+      if (!id || !DB.farmers[id]) {
+        alert(lang === 'en' ? "Please verify Farmer profile ID mapping assignment!" : "कृपया किसान आईडी प्रोफाइल की जांच करें!");
+        return;
+      }
+      if (liters <= 0 || fat <= 0) {
+        alert(lang === 'en' ? "Values must exceed baseline numeric value 0!" : "मान 0 से अधिक होना चाहिए!");
+        return;
+      }
+
+      DB.entries.push({ id, date, session: currentSession, type, liters, fat, amount: amt });
+      syncStorage();
+      alert(lang === 'en' ? "Collection record added!" : "संग्रह प्रविष्टि सुरक्षित की गई!");
+      clearEntryInputs();
+    }
+
+    function clearEntryInputs() {
+      document.getElementById('entry-id').value = '';
+      document.getElementById('entry-name').value = '';
+      document.getElementById('entry-liters').value = '';
+      document.getElementById('entry-fat').value = '';
+      document.getElementById('entry-amount').value = '0.00';
+    }
+
+    // ==================== DISPATCH LOGIC ====================
+    let currentDispSession = 'morning';
+    
+    function setDispatchSession(s) {
+      currentDispSession = s;
+      document.getElementById('btn-d-morn').classList.toggle('active', s === 'morning');
+      document.getElementById('btn-d-eve').classList.toggle('active', s === 'evening');
+    }
+
+    function saveDispatchRecord() {
+      const date = document.getElementById('dispatch-date').value || today();
+      const liters = parseFloat(document.getElementById('disp-liters').value) || 0;
+      const fat = parseFloat(document.getElementById('disp-fat').value) || 0;
+      const rate = parseFloat(document.getElementById('disp-rate').value) || 0;
+
+      if (liters <= 0 || fat <= 0 || rate <= 0) {
+        alert(lang === 'en' ? "All factory values must be greater than 0!" : "सभी मान 0 से अधिक होने चाहिए!");
+        return;
+      }
+
+      const totalAmt = liters * (rate / 10) * fat;
+      DB.dispatch.push({ date, session: currentDispSession, liters, fat, rate, amount: totalAmt });
+      syncStorage();
+
+      alert(lang === 'en' ? "Factory dispatch record saved successfully!" : "फैक्ट्री डिस्पैच रिकॉर्ड सुरक्षित किया गया!");
+      document.getElementById('disp-liters').value = '';
+      document.getElementById('disp-fat').value = '';
+      document.getElementById('disp-rate').value = '';
+    }
+
+    // ==================== FARMERS MANAGEMENT ====================
+    function addFarmerProfile() {
+      const id = document.getElementById('new-farmer-id').value.trim();
+      const name = document.getElementById('new-farmer-name').value.trim();
+
+      if (!id || !name) {
+        alert(lang === 'en' ? "Missing data configurations!" : "डेटा कॉन्फ़िगरेशन गुम है!");
+        return;
+      }
+      if (DB.farmers[id]) {
+        alert(lang === 'en' ? "ID slot collision found!" : "आईडी स्लॉट टकराव मिला!");
+        return;
+      }
+
+      DB.farmers[id] = name;
+      syncStorage();
+      document.getElementById('new-farmer-id').value = '';
+      document.getElementById('new-farmer-name').value = '';
+      renderFarmersList();
+    }
+
+    function renderFarmersList() {
+      const tbody = document.getElementById('table-farmers-body');
+      tbody.innerHTML = '';
+      for (let id in DB.farmers) {
+        tbody.innerHTML += `<tr><td><strong>#${id}</strong></td><td>${DB.farmers[id]}</td></tr>`;
+      }
+      if (Object.keys(DB.farmers).length === 0) {
+        tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-muted);">${lang === 'en' ? 'No farmers registered' : 'कोई किसान पंजीकृत नहीं'}</td></tr>`;
+      }
+    }
+
+    // ==================== BILLING REPORTS ====================
+    function generateBill() {
+      const start = document.getElementById('bill-start').value;
+      const end = document.getElementById('bill-end').value;
+      const output = document.getElementById('billing-results-output');
+
+      if (!start || !end) {
+        alert(lang === 'en' ? "Select date range!" : "तिथि सीमा चुनें!");
+        return;
+      }
+
+      const customerStatements = {};
+      DB.entries.forEach(e => {
+        if (e.date >= start && e.date <= end) {
+          if (!customerStatements[e.id]) customerStatements[e.id] = [];
+          customerStatements[e.id].push(e);
+        }
+      });
+
+      let html = `<h2 style="margin-top:10px">${lang === 'en' ? 'Compiled Invoices' : 'संकलित बिल सूची'}</h2>`;
+      let zeroRecords = true;
+
+      for (let clientId in customerStatements) {
+        zeroRecords = false;
+        const records = customerStatements[clientId];
+        let clientLiters = 0, clientTotalCash = 0;
+        let tableRows = '';
+
+        records.forEach(r => {
+          clientLiters += r.liters;
+          clientTotalCash += r.amount;
+          tableRows += `<tr>
+            <td>${r.date.substring(5)}</td>
+            <td>${r.type === 'cow' ? '🐄 Cow' : '🦬 Buffalo'}</td>
+            <td>${r.liters.toFixed(1)}L</td>
+            <td>${r.fat.toFixed(1)}</td>
+            <td>₹${r.amount.toFixed(2)}</td>
+          </tr>`;
+        });
+
+        html += `
+        <div class="card" style="margin-top:12px">
+          <div style="font-weight:700; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:8px;">
+            #${clientId} - ${DB.farmers[clientId] || 'Unknown'}
+          </div>
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Liters</th>
+                <th>Fat%</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+            <tfoot>
+              <tr style="background: var(--primary-light);">
+                <td colspan="2"><strong>Total:</strong></td>
+                <td><strong>${clientLiters.toFixed(1)}L</strong></td>
+                <td></td>
+                <td><strong>₹${clientTotalCash.toFixed(2)}</strong></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>`;
+      }
+      output.innerHTML = zeroRecords ? `<div class="card" style="text-align:center; padding:20px;">${lang === 'en' ? 'No matching records found.' : 'कोई मिलान रिकॉर्ड नहीं मिला।'}</div>` : html;
+    }
+
+    // ==================== AI PAYLOAD ====================
+    function generateAIPayload() {
+      let totalInLiters = 0, totalInCost = 0;
+      DB.entries.forEach(e => { totalInLiters += e.liters; totalInCost += e.amount; });
+
+      let totalOutLiters = 0, totalOutRevenue = 0;
+      DB.dispatch.forEach(d => { totalOutLiters += d.liters; totalOutRevenue += d.amount; });
+
+      const margin = totalOutRevenue - totalInCost;
+      const marginPercent = totalInCost > 0 ? (margin / totalInCost * 100).toFixed(2) : 0;
+
+      const promptStr = `You are an expert dairy business consultant AI assistant. Analyze my local collection plant data metrics down below:
+
+📊 DATA SUMMARY:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 Farmer Payments:
+   - Total Milk Purchased: ${totalInLiters.toFixed(2)} Liters
+   - Cash Disbursed to Farmers: ₹${totalInCost.toFixed(2)}
+   - Average Purchase Price: ₹${(totalInLiters > 0 ? totalInCost / totalInLiters : 0).toFixed(2)}/L
+
+🏭 Factory Dispatch:
+   - Total Outbound Dispatch: ${totalOutLiters.toFixed(2)} Liters
+   - Revenue Received From Factory: ₹${totalOutRevenue.toFixed(2)}
+   - Average Selling Price: ₹${(totalOutLiters > 0 ? totalOutRevenue / totalOutLiters : 0).toFixed(2)}/L
+
+📈 Profit Analysis:
+   - Net Profit Margin: ₹${margin.toFixed(2)}
+   - Profit Percentage: ${marginPercent}%
+   - Volume Shrinkage: ${(totalInLiters - totalOutLiters).toFixed(2)} Liters (${totalInLiters > 0 ? ((totalInLiters - totalOutLiters) / totalInLiters * 100).toFixed(2) : 0}%)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please provide:
+1. Strategic optimization insights to maximize milk plant operation health
+2. Fat shrinkage loss analysis and recommendations
+3. Pricing strategy suggestions
+4. Operational efficiency improvements
+
+Be specific and actionable in your recommendations.`;
+
+      document.getElementById('ai-textarea').value = promptStr;
+      document.getElementById('ai-prompt-box').style.display = 'block';
+    }
+
+    // ==================== SETUP & DEMO ====================
+    function loadSandboxDemoData() {
+      DB.farmers = { "101": "Rajesh Kumar", "102": "Sanjay Singh", "103": "Amit Patel" };
+      
+      const todayStr = today();
+      DB.rates = { [`${todayStr}_morning`]: { cow: 72, buffalo: 102 } };
+      
+      DB.entries = [
+        { id: "101", date: todayStr, session: "morning", type: "cow", liters: 12.5, fat: 4.2, amount: 37.80 },
+        { id: "102", date: todayStr, session: "morning", type: "buffalo", liters: 8.0, fat: 6.8, amount: 55.48 },
+        { id: "103", date: todayStr, session: "morning", type: "cow", liters: 15.0, fat: 4.5, amount: 48.60 }
+      ];
+      
+      DB.dispatch = [
+        { date: todayStr, session: "morning", liters: 35.5, fat: 5.2, rate: 106, amount: 195.88 }
+      ];
+      
+      syncStorage();
+      alert(lang === 'en' ? "Sandbox test profiles initialized!" : "सैंडबॉक्स परीक्षण प्रोफाइल आरंभीकृत!");
+      
+      // Refresh UI
+      onDateOrSessionChange();
+      if (document.getElementById('screen-farmers').classList.contains('active')) {
+        renderFarmersList();
+      }
+    }
+
+    function wipeLocalDatabase() {
+      if (confirm(lang === 'en' ? "Are you absolutely sure you want to delete all storage data logs permanently?" : "क्या आप सभी स्टोरेज डेटा को स्थायी रूप से हटाना चाहते हैं?")) {
+        localStorage.removeItem('dairybook_db_v1');
+        DB = { farmers: {}, rates: {}, entries: [], dispatch: [] };
+        alert(lang === 'en' ? "Database wiped!" : "डेटाबेस साफ़ हो गया!");
+        location.reload();
+      }
+    }
+
+    // ==================== SERVICE WORKER REGISTRATION ====================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker registered:', reg.scope))
+          .catch(err => console.log('Service Worker error:', err));
+      });
+    }
+
+    // ==================== INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadLocalStorageEngine();
+      
+      // Set default dates
+      const todayStr = today();
+      document.getElementById('entry-date').value = todayStr;
+      document.getElementById('dispatch-date').value = todayStr;
+      document.getElementById('bill-start').value = todayStr;
+      document.getElementById('bill-end').value = todayStr;
+      
+      // Set language
+      setLanguage();
+      
+      // Initialize session
+      onDateOrSessionChange();
+      
+      // Set default active session buttons
+      document.getElementById('btn-morning').classList.add('active');
+      document.getElementById('btn-d-morn').classList.add('active');
+      
+      // Render farmers list if needed
+      renderFarmersList();
     });
-    billText+=`━━━━━━━━━━━━\n${lbl?'कुल':'Total'}: *${totalQty.toFixed(1)}L = ₹${totalAmt.toFixed(2)}*\n${lbl?'नकद':'Cash'}: ₹${cashReceived.toFixed(2)}\n${lbl?'बकाया':'Due'}: *₹${outstanding.toFixed(2)}*\n━━━━━━━━━━━━\n_DairyBook_`;
-    const tableHead=isBulk?`<th>${lbl?'तारीख':'Date'}</th><th>${lbl?'मात्रा':'Qty'}</th><th>Fat%</th><th>${lbl?'दर':'Rate'}</th><th>${lbl?'राशि':'Amt'}</th><th></th>`:`<th>${lbl?'तारीख':'Date'}</th><th>${lbl?'मात्रा':'Qty'}</th><th>${lbl?'दर':'Rate'}</th><th>${lbl?'राशि':'Amt'}</th><th></th>`;
-    const safe=encodeURIComponent(billText);
-    html+=`<div class="card"><div class="card-title">🧾 ${c.name}<span class="badge ${isBulk?'badge-bulk':'badge-retail'}" style="margin-left:4px">${isBulk?(lbl?'थोक':'Bulk'):(lbl?'खुदरा':'Retail')}</span><span style="font-size:12px;color:var(--text-soft);margin-left:4px">${month}</span></div><table class="mini-table"><thead><tr>${tableHead}</tr></thead><tbody>${tableRows}</tbody><td><div style="height:1px;background:var(--border);margin:10px 0"></div><div class="bill-row"><span>${lbl?'कुल मात्रा':'Total qty'}</span><span>${totalQty.toFixed(1)} L</span></div><div class="bill-row"><span class="bill-total" style="font-weight:700">${lbl?'कुल राशि':'Total amount'}</span><span class="bill-total" style="font-size:18px">₹${totalAmt.toFixed(2)}</span></div><div class="payment-summary"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--green)">💵 ${lbl?'नकद प्राप्त':'Cash received'}</span><strong style="color:var(--green)">₹${cashReceived.toFixed(2)}</strong></div><div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--red)">💳 ${lbl?'बकाया':'Outstanding'}</span><strong style="color:var(--red)">₹${outstanding.toFixed(2)}</strong></div></div><div class="share-buttons"><button class="btn btn-wa btn-sm" onclick="shareWA(decodeURIComponent('${safe}'),'${c.phone||''}')">📱 WhatsApp</button><button class="btn btn-outline btn-sm" onclick="copyBill(decodeURIComponent('${safe}'))">📋 ${lbl?'कॉपी':'Copy'}</button></div></div>`;
-  });
-  document.getElementById('bill-output').innerHTML=html||`<div class="card"><div style="color:var(--text-soft);font-size:13px">${currentLang==='hi'?'इस अवधि के लिए कोई डेटा नहीं':'No data for this period'}</div></div>`;
-}
-function shareWA(text,phone){let url='https://wa.me/?text='+encodeURIComponent(text);if(phone){let c=phone.replace(/\D/g,'');if(c.length===10)c='91'+c;url='https://wa.me/'+c+'?text='+encodeURIComponent(text);}window.open(url,'_blank');}
-function copyBill(text){navigator.clipboard.writeText(text);toast(currentLang==='hi'?'📋 बिल कॉपी हुआ!':'📋 Copied!');}
-
-// ══════════════════════════════════════════
-//  SETUP
-// ══════════════════════════════════════════
-function renderSetupScreen(){renderCoopRates();renderRetailRates();renderAnimalListSetup();renderPersonListSetup();const k=getApiKey();if(k){document.getElementById('api-key-status').textContent='✅ Saved ('+k.slice(0,8)+'...)';document.getElementById('api-key-input').value=k;}if(googleSheetsUrl){document.getElementById('sheets-script-url').value=googleSheetsUrl;document.getElementById('sheets-status').textContent='✅ '+(currentLang==='hi'?'कनेक्टेड':'Connected');}}
-function renderAnimalListSetup(){const a=getAnimals(),el=document.getElementById('animal-list-display');el.innerHTML=a.map(x=>`<div class="list-item" style="margin-bottom:6px"><div class="list-item-left"><span class="list-item-name">${x.name}</span><span class="badge ${milkTypeBadgeClass(x.type)}" style="margin-left:6px">${milkTypeLabel(x.type)}</span></div><button class="btn btn-outline btn-sm" onclick="deleteAnimal('${x.id}')">✕</button></div>`).join('')||`<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${currentLang==='hi'?'कोई पशु नहीं':'No animals yet'}</div>`;}
-function renderPersonListSetup(){const p=getPersons(),el=document.getElementById('person-list-display');el.innerHTML=p.map(x=>`<div class="list-item" style="margin-bottom:6px"><div class="list-item-left"><span class="list-item-name">${x.name}</span>${x.phone?`<div class="list-item-sub">${x.phone}</div>`:''}</div><button class="btn btn-outline btn-sm" onclick="deletePerson('${x.id}')">✕</button></div>`).join('')||`<div style="font-size:13px;color:var(--text-soft);margin-bottom:8px">${currentLang==='hi'?'कोई व्यक्ति नहीं':'No persons yet'}</div>`;}
-function addAnimal(){const n=document.getElementById('an-name').value.trim(),t=document.getElementById('an-type').value;if(!n)return;saveAnimals([...getAnimals(),{id:genId(),name:n,type:t}]);document.getElementById('an-name').value='';renderAnimalListSetup();toast(currentLang==='hi'?'पशु जोड़ा':'Added');syncToSheets();}
-function deleteAnimal(id){saveAnimals(getAnimals().filter(a=>a.id!==id));renderAnimalListSetup();}
-function addPerson(){const n=document.getElementById('ps-name').value.trim(),p=document.getElementById('ps-phone').value.trim();if(!n)return;savePersons([...getPersons(),{id:genId(),name:n,phone:p}]);document.getElementById('ps-name').value='';document.getElementById('ps-phone').value='';renderPersonListSetup();toast(currentLang==='hi'?'व्यक्ति जोड़ा':'Added');syncToSheets();}
-function deletePerson(id){savePersons(getPersons().filter(p=>p.id!==id));renderPersonListSetup();}
-function saveApiKey(){const k=document.getElementById('api-key-input').value.trim();if(!k)return;localStorage.setItem('openrouter_api_key',k);document.getElementById('api-key-status').textContent='✅ Saved ('+k.slice(0,8)+'...)';toast(currentLang==='hi'?'API key सहेजी':'API key saved');}
-function exportData(){const d={animals:getAnimals(),persons:getPersons(),clients:getClients(),sessions:getSessions(),dispatches:getDispatches(),fat_rates:getFatRates(),retail_rates:getRetailRates()};const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='dairybook_'+today()+'.json';a.click();URL.revokeObjectURL(u);}
-function resetAllData(){if(!confirm(currentLang==='hi'?'सब हटेगा! निश्चित?':'Delete ALL data?'))return;const k=[];for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&key.startsWith('dairy_'))k.push(key);}k.forEach(x=>localStorage.removeItem(x));toast(currentLang==='hi'?'✅ रीसेट हो गया':'✅ Reset done');setTimeout(()=>location.reload(),1000);}
-
-// ══════════════════════════════════════════
-//  FISCAL YEAR
-// ══════════════════════════════════════════
-function getCurrentFiscalYear(){const d=new Date(),y=d.getFullYear(),m=d.getMonth()+1;return m>=4?`${y}-${(y+1).toString().slice(-2)}`:`${y-1}-${y.toString().slice(-2)}`;}
-function getFiscalYearStartDate(fy){return`${parseInt(fy.split('-')[0])}-04-01`;}
-function updateFiscalYearDisplay(){const curFy=getCurrentFiscalYear(),savedFy=localStorage.getItem('current_fiscal_year')||curFy;['displayCurrentFy','currentFyBadge','fyBadge'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=savedFy;});const el=document.getElementById('displayFyStart');if(el)el.textContent=getFiscalYearStartDate(savedFy);const start=getFiscalYearStartDate(savedFy);const se=document.getElementById('fySessionsCount');if(se)se.textContent=getSessions().filter(s=>s.date>=start).length;const de=document.getElementById('fyDispatchesCount');if(de)de.textContent=getDispatches().filter(d=>d.date>=start).length;const wb=document.getElementById('fyWarningBox');if(wb)wb.style.display=(savedFy!==curFy)?'block':'none';}
-function showFiscalYearDialog(){if(confirm(currentLang==='hi'?'वर्तमान वर्ष का डेटा संग्रहीत होगा। जारी रखें?':'Archive current year data and start new FY?'))archiveCurrentData();}
-function archiveCurrentData(){const curFy=getCurrentFiscalYear(),oldFy=localStorage.getItem('current_fiscal_year')||curFy;localStorage.setItem('dairy_archive_'+oldFy,JSON.stringify({animals:getAnimals(),persons:getPersons(),clients:getClients(),sessions:getSessions(),dispatches:getDispatches(),fat_rates:getFatRates(),retail_rates:getRetailRates(),archived_date:new Date().toISOString()}));saveSessions([]);saveDispatches([]);localStorage.setItem('current_fiscal_year',curFy);toast(currentLang==='hi'?'✅ आर्काइव हो गया!':'✅ Archived!');updateFiscalYearDisplay();renderHome();}
-function viewArchivedData(){const a=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('dairy_archive_'))a.push(k.replace('dairy_archive_',''));}alert(a.length?(currentLang==='hi'?'आर्काइव वर्ष: ':'Archived FYs: ')+a.join(', '):(currentLang==='hi'?'कोई आर्काइव नहीं':'No archives yet'));}
-
-// ══════════════════════════════════════════
-//  AI
-// ══════════════════════════════════════════
-function buildContext(){const animals=getAnimals(),clients=getClients(),sessions=getSessions(),dispatches=getDispatches();const td=today(),thisMonth=td.slice(0,7);const monthDisp=dispatches.filter(d=>d.date.startsWith(thisMonth));const clientBills=clients.map(c=>{const cd=monthDisp.filter(d=>d.client_id===c.id);const amt=cd.reduce((a,d)=>a+parseFloat(d.qty||0)*parseFloat(d.rate_per_litre||0),0);const cash=cd.filter(d=>d.payment_mode==='cash').reduce((a,d)=>a+parseFloat(d.cash_received||0),0);return{name:c.name,type:c.clientType,milk:c.milkType,qty:cd.reduce((a,d)=>a+parseFloat(d.qty||0),0).toFixed(1),bill:amt.toFixed(2),cash:cash.toFixed(2),due:(amt-cash).toFixed(2)};});const todaySess=sessions.filter(s=>s.date===td);const lbl=currentLang==='hi';return `You are DairyBook AI for an Indian dairy. Respond in ${lbl?'Hindi':'English'}. Today: ${td}. Month: ${thisMonth}. TWO CLIENT TYPES: BULK (cooperative) — mix milk, billed by fat% × cooperative rate table. RETAIL — cow or buffalo milk, billed at flat ₹/litre rate. Today sessions: ${JSON.stringify(todaySess.map(s=>({session:s.session,type:s.milkType,fat:s.fat,qty:s.totalQty})))}. Clients monthly: ${JSON.stringify(clientBills)}. Total outstanding: ₹${clientBills.reduce((a,c)=>a+parseFloat(c.due),0).toFixed(2)}. Total cash this month: ₹${clientBills.reduce((a,c)=>a+parseFloat(c.cash),0).toFixed(2)}. Cooperative fat rates: ${JSON.stringify(getFatRates())}. Retail rates: ${JSON.stringify(getRetailRates())}. Be concise and give exact numbers.`;}
-let chatHistory=[];
-async function sendChat(){const i=document.getElementById('chat-input');const m=i.value.trim();if(!m)return;i.value='';askAI(m);}
-async function askAI(msg){const k=getApiKey();if(!k){addMsg('ai',currentLang==='hi'?'❌ Setup में जाकर API key दर्ज करें।':'❌ Go to Setup and enter your API key.');return;}addMsg('user',msg);chatHistory.push({role:'user',content:msg});goTo('ai');const tid='t_'+Date.now();const ce=document.getElementById('chat-messages');const div=document.createElement('div');div.className='msg ai';div.id=tid;div.innerHTML=`<div class="ai-thinking"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;ce.appendChild(div);ce.scrollTop=ce.scrollHeight;try{const resp=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${k}`},body:JSON.stringify({model:'google/gemma-2-9b-it:free',max_tokens:1000,messages:[{role:'system',content:buildContext()},...chatHistory]})});const data=await resp.json();const reply=data.choices?.[0]?.message?.content||(currentLang==='hi'?'उत्तर नहीं मिला':'No response');chatHistory.push({role:'assistant',content:reply});document.getElementById(tid)?.remove();addMsg('ai',reply);}catch(e){document.getElementById(tid)?.remove();addMsg('ai','❌ '+e.message);}}
-function addMsg(role,text){const ce=document.getElementById('chat-messages');const d=document.createElement('div');d.className='msg '+role;d.innerHTML=`<div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div><div class="msg-time">${nowTime()}</div>`;ce.appendChild(d);ce.scrollTop=ce.scrollHeight;}
-
-// ══════════════════════════════════════════
-//  SAMPLE DATA
-// ══════════════════════════════════════════
-function loadSampleData(){
-  if(!confirm(currentLang==='hi'?'नमूना डेटा लोड करें?':'Load sample data?'))return;
-  saveAnimals([{id:'a1',name:'Ganga',type:'cow'},{id:'a2',name:'Jamuna',type:'cow'},{id:'a3',name:'Kali',type:'buffalo'},{id:'a4',name:'Shyama',type:'buffalo'}]);
-  savePersons([{id:'p1',name:'Ramesh',phone:'9876543210'},{id:'p2',name:'Suresh',phone:'9123456789'}]);
-  saveClients([{id:'c1',name:'Sharma Dairy (Bulk)',phone:'9000000001',clientType:'bulk',milkType:'mix',daily_qty:40},{id:'c2',name:'Verma Ji (Retail)',phone:'9000000002',clientType:'retail',milkType:'buffalo',daily_qty:2},{id:'c3',name:'Gupta Ji (Retail)',phone:'9000000003',clientType:'retail',milkType:'cow',daily_qty:3}]);
-  saveFatRates([{id:'fr1',milk_type:'cow',fat:4.0,rate:38},{id:'fr2',milk_type:'cow',fat:4.5,rate:42},{id:'fr3',milk_type:'cow',fat:5.0,rate:46},{id:'fr4',milk_type:'cow',fat:5.5,rate:50},{id:'fr5',milk_type:'cow',fat:6.0,rate:55},{id:'fr6',milk_type:'buffalo',fat:6.0,rate:58},{id:'fr7',milk_type:'buffalo',fat:6.5,rate:62},{id:'fr8',milk_type:'buffalo',fat:7.0,rate:66},{id:'fr9',milk_type:'buffalo',fat:7.5,rate:70},{id:'fr10',milk_type:'buffalo',fat:8.0,rate:75},{id:'fr11',milk_type:'mix',fat:5.0,rate:44},{id:'fr12',milk_type:'mix',fat:5.5,rate:48},{id:'fr13',milk_type:'mix',fat:6.0,rate:52},{id:'fr14',milk_type:'mix',fat:6.5,rate:56}]);
-  saveRetailRates({cow:46,buffalo:66});
-  const base=new Date();let sess=[],disp=[];
-  for(let i=0;i<6;i++){const d=new Date(base);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];
-    sess.push({id:genId(),date:ds,session:'morning',milkType:'cow',fat:5.2,totalQty:15.5,entries:[{animal_id:'a1',name:'Ganga',qty:8.0},{animal_id:'a2',name:'Jamuna',qty:7.5}],person_id:'p1',person:'Ramesh'},{id:genId(),date:ds,session:'morning',milkType:'buffalo',fat:7.1,totalQty:18.0,entries:[{animal_id:'a3',name:'Kali',qty:9.5},{animal_id:'a4',name:'Shyama',qty:8.5}],person_id:'p1',person:'Ramesh'},{id:genId(),date:ds,session:'evening',milkType:'cow',fat:4.8,totalQty:13.0,entries:[{animal_id:'a1',name:'Ganga',qty:7.0},{animal_id:'a2',name:'Jamuna',qty:6.0}],person_id:'p2',person:'Suresh'},{id:genId(),date:ds,session:'evening',milkType:'buffalo',fat:6.8,totalQty:16.0,entries:[{animal_id:'a3',name:'Kali',qty:8.5},{animal_id:'a4',name:'Shyama',qty:7.5}],person_id:'p2',person:'Suresh'});
-    const mCowQ=15.5,mBufQ=18.0,mCowF=5.2,mBufF=7.1;const mixFatM=((mCowQ*mCowF+mBufQ*mBufF)/(mCowQ+mBufQ));
-    const eCowQ=13.0,eBufQ=16.0,eCowF=4.8,eBufF=6.8;const mixFatE=((eCowQ*eCowF+eBufQ*eBufF)/(eCowQ+eBufQ));
-    disp.push({id:genId(),date:ds,session:'morning',client_id:'c1',client_name:'Sharma Dairy (Bulk)',clientType:'bulk',milk_type:'mix',qty:30,fat:parseFloat(mixFatM.toFixed(1)),rate_per_litre:52,payment_mode:'credit',cash_received:0},{id:genId(),date:ds,session:'morning',client_id:'c2',client_name:'Verma Ji',clientType:'retail',milk_type:'buffalo',qty:2,fat:0,rate_per_litre:66,payment_mode:'cash',cash_received:132},{id:genId(),date:ds,session:'morning',client_id:'c3',client_name:'Gupta Ji',clientType:'retail',milk_type:'cow',qty:3,fat:0,rate_per_litre:46,payment_mode:'credit',cash_received:0},{id:genId(),date:ds,session:'evening',client_id:'c1',client_name:'Sharma Dairy (Bulk)',clientType:'bulk',milk_type:'mix',qty:25,fat:parseFloat(mixFatE.toFixed(1)),rate_per_litre:48,payment_mode:'credit',cash_received:0},{id:genId(),date:ds,session:'evening',client_id:'c3',client_name:'Gupta Ji',clientType:'retail',milk_type:'cow',qty:3,fat:0,rate_per_litre:46,payment_mode:'cash',cash_received:138});
-  }
-  saveSessions(sess);saveDispatches(disp);
-  toast(currentLang==='hi'?'✅ नमूना डेटा लोड!':'✅ Sample data loaded!');renderHome();
-}
-
-// ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
-function init(){
-  document.getElementById('todayDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-  if(!localStorage.getItem('current_fiscal_year'))localStorage.setItem('current_fiscal_year',getCurrentFiscalYear());
-  setLanguage(currentLang);
-  updateFiscalYearDisplay();
-  renderHome();
-}
-init();
-</script>
+  </script>
 </body>
 </html>
