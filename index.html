@@ -1,983 +1,617 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>DairyBook</title>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- PWA Support -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/ios/180.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="DairyBook">
-  <meta name="theme-color" content="#2563eb">
-  <meta name="mobile-web-app-capable" content="yes">
-  
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-light: #dbeafe;
-      --success: #16a34a;
-      --success-light: #dcfce7;
-      --danger: #dc2626;
-      --danger-light: #fee2e2;
-      --purple: #7c3aed;
-      --purple-light: #f3e8ff;
-      --background: #f8fafc;
-      --surface: #ffffff;
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      
-      --font-head: 'Baloo 2', cursive;
-      --font-body: 'Noto Sans', sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>DairyBook – दुग्ध प्रबंधन प्रणाली</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+<!-- PWA Support -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/ios/180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DairyBook">
+<meta name="theme-color" content="#5C3D2E">
+<meta name="mobile-web-app-capable" content="yes">
 
-    body {
-      font-family: var(--font-body);
-      background-color: var(--background);
-      color: var(--text);
-      line-height: 1.5;
-      padding-bottom: 80px;
-    }
+<style>
+:root {
+  --cream:#FDF6EC;--milk:#FFFDF8;--brown:#5C3D2E;--brown-light:#8B6347;--brown-pale:#E8D5C0;
+  --green:#2E7D5C;--green-light:#4CAF85;--green-pale:#D4EDE3;
+  --amber:#D4820A;--amber-pale:#FFF0CC;
+  --blue:#1A6FA8;--blue-pale:#DDEEFF;
+  --red:#C0392B;--red-pale:#FDECEA;
+  --purple:#6B3FA0;--purple-pale:#EDE5F8;
+  --teal:#0F7B6C;--teal-pale:#D4F0EB;
+  --text:#2C1810;--text-soft:#7A5C50;--border:#E0CCBB;
+  --shadow:0 2px 12px rgba(92,61,46,0.10);--radius:14px;
+  --font-head:'Baloo 2',cursive;--font-body:'Noto Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font-body);background:var(--cream);color:var(--text);min-height:100vh;max-width:480px;margin:0 auto;padding-bottom:80px}
 
-    header {
-      background-color: var(--primary);
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+.lang-toggle{position:fixed;top:70px;right:10px;z-index:200;background:var(--brown);border-radius:30px;padding:4px;display:flex;gap:4px;box-shadow:var(--shadow)}
+.lang-btn{padding:5px 12px;border:none;border-radius:30px;cursor:pointer;font-weight:600;font-size:12px;background:transparent;color:#fff;opacity:0.6}
+.lang-btn.active{background:var(--amber);opacity:1}
 
-    .brand {
-      font-family: var(--font-head);
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-    }
+.topbar{background:var(--brown);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar h1{font-family:var(--font-head);font-size:22px;font-weight:700}
+.topbar .sub{font-size:11px;opacity:0.7;margin-top:-2px}
+.topbar-right{font-size:12px;opacity:0.8;text-align:right}
+.fy-badge{background:var(--amber);padding:2px 8px;border-radius:20px;font-size:10px;margin-left:8px}
 
-    .lang-btn {
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-    }
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--brown);display:flex;z-index:100}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px 10px;cursor:pointer;opacity:0.55;transition:opacity 0.15s;border:none;background:none;color:#fff;font-family:var(--font-body)}
+.bnav-item.active{opacity:1}
+.bnav-item .icon{font-size:22px;margin-bottom:2px}
+.bnav-item .label{font-size:10px;font-weight:500}
 
-    .screen {
-      display: none;
-      padding: 16px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
+.screen{display:none;padding:12px 14px}
+.screen.active{display:block}
+.card{background:var(--milk);border-radius:var(--radius);border:1px solid var(--border);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card-title{font-family:var(--font-head);font-size:15px;font-weight:600;color:var(--brown);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sec-header{font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--brown);margin:6px 0 12px}
 
-    .screen.active {
-      display: block;
-    }
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-box{background:var(--milk);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:var(--font-head);font-size:24px;font-weight:700}
+.stat-label{font-size:11px;color:var(--text-soft);margin-top:2px}
+.stat-box.green{background:var(--green-pale);border-color:var(--green-light)}.stat-box.green .stat-num{color:var(--green)}
+.stat-box.amber{background:var(--amber-pale);border-color:var(--amber)}.stat-box.amber .stat-num{color:var(--amber)}
+.stat-box.blue{background:var(--blue-pale);border-color:var(--blue)}.stat-box.blue .stat-num{color:var(--blue)}
+.stat-box.brown{background:#F5EAE0;border-color:var(--brown-light)}.stat-box.brown .stat-num{color:var(--brown)}
 
-    .card {
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      border: 1px solid var(--border);
-    }
+.form-row{margin-bottom:10px}
+.form-label{font-size:12px;color:var(--text-soft);margin-bottom:4px;font-weight:500}
+.form-input,.form-select{width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--milk);font-family:var(--font-body);font-size:14px;color:var(--text);outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--brown-light)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
-    h2 {
-      font-family: var(--font-head);
-      font-size: 20px;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:10px;border:none;font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:transform 0.1s,opacity 0.1s}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-brown{background:var(--brown);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+.btn-full{width:100%}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+.btn-wa{background:#25D366;color:#fff}
+.btn-danger{background:var(--red);color:#fff}
 
-    .form-group {
-      margin-bottom: 14px;
-    }
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-cow{background:var(--blue-pale);color:var(--blue)}
+.badge-buffalo{background:var(--purple-pale);color:var(--purple)}
+.badge-mix{background:var(--teal-pale);color:var(--teal)}
+.badge-bulk{background:#E8F5E9;color:#1B5E20}
+.badge-retail{background:var(--amber-pale);color:var(--amber)}
+.badge-cash{background:#FFF0CC;color:#b36b00}
+.badge-credit{background:var(--red-pale);color:var(--red)}
 
-    label {
-      display: block;
-      font-weight: 600;
-      font-size: 14px;
-      margin-bottom: 6px;
-      color: var(--text-muted);
-    }
+.mini-table{width:100%;border-collapse:collapse;font-size:13px}
+.mini-table th{color:var(--text-soft);font-weight:600;font-size:11px;text-align:left;padding:4px 6px;border-bottom:1px solid var(--border)}
+.mini-table td{padding:7px 6px;border-bottom:1px solid #F0E8E0;color:var(--text)}
+.mini-table tr:last-child td{border-bottom:none}
 
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 15px;
-      font-family: var(--font-body);
-      outline: none;
-      transition: border-color 0.2s;
-    }
+.list-item{background:var(--milk);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.list-item-left{flex:1}
+.list-item-name{font-weight:600;font-size:14px}
+.list-item-sub{font-size:12px;color:var(--text-soft);margin-top:2px}
 
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
-    }
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px)}
+.chat-messages{flex:1;overflow-y:auto;padding:4px 0 12px}
+.msg{margin-bottom:10px;display:flex;flex-direction:column}
+.msg.user{align-items:flex-end}.msg.ai{align-items:flex-start}
+.msg-bubble{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5}
+.msg.user .msg-bubble{background:var(--brown);color:#fff;border-bottom-right-radius:4px}
+.msg.ai .msg-bubble{background:var(--milk);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px}
+.msg-time{font-size:10px;color:var(--text-soft);margin-top:3px;padding:0 4px}
+.chat-input-row{display:flex;gap:8px;padding:8px 0 2px;border-top:1px solid var(--border)}
+.chat-input{flex:1;padding:10px 14px;border-radius:20px;border:1.5px solid var(--border);font-family:var(--font-body);font-size:14px;background:var(--milk);color:var(--text);outline:none}
+.chat-input:focus{border-color:var(--brown-light)}
+.chat-send{width:42px;height:42px;border-radius:50%;background:var(--brown);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chip{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--milk);font-size:12px;cursor:pointer;color:var(--text-soft);font-family:var(--font-body)}
+.chip:active{background:var(--brown-pale)}
 
-    .toggle-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--brown);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.divider{height:1px;background:var(--border);margin:12px 0}
 
-    .toggle-btn {
-      background: var(--background);
-      border: 1px solid var(--border);
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    }
+.session-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:12px}
+.session-toggle button{flex:1;padding:9px;border:none;background:transparent;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;transition:background 0.15s,color 0.15s;color:var(--text-soft)}
+.session-toggle button.active{background:var(--brown);color:#fff}
 
-    .toggle-btn.active {
-      background: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
+.client-type-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:10px}
+.client-type-toggle button{flex:1;padding:8px;border:none;background:transparent;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;color:var(--text-soft)}
+.client-type-toggle button.active.bulk{background:#1B5E20;color:#fff}
+.client-type-toggle button.active.retail{background:var(--amber);color:#fff}
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.2s;
-      text-align: center;
-      display: block;
-      margin-bottom: 10px;
-    }
+.dispatch-client-card{border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:12px;background:var(--milk)}
+.dispatch-client-card.bulk{border-left:4px solid #1B5E20}
+.dispatch-client-card.retail{border-left:4px solid var(--amber)}
 
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-success { background: var(--success); color: white; }
-    .btn-purple { background: var(--purple); color: white; }
-    .btn-danger { background: var(--danger); color: white; }
-    .btn-outline-danger {
-      background: transparent;
-      border: 1px solid var(--danger);
-      color: var(--danger);
-    }
+.session-fat-box{background:var(--amber-pale);border:1px solid var(--amber);border-radius:10px;padding:12px;margin-bottom:12px}
+.session-fat-title{font-size:12px;font-weight:600;color:var(--amber);margin-bottom:8px}
+.fat-input-row{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.fat-input-row label{font-size:13px;font-weight:600;min-width:80px}
+.fat-input-row input{flex:1;padding:8px 10px;border-radius:8px;border:1.5px solid var(--amber);background:#fff;font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--amber);outline:none;text-align:center}
 
-    .mini-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 8px;
-      font-size: 14px;
-    }
+.payment-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin:8px 0}
+.payment-toggle button{flex:1;padding:8px;border:none;background:transparent;font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer}
+.payment-toggle button.active-cash{background:#27AE60;color:#fff}
+.payment-toggle button.active-credit{background:#F39C12;color:#fff}
 
-    .mini-table th, .mini-table td {
-      padding: 8px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
+.bill-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--border)}
+.bill-row:last-child{border:none;font-weight:700;font-size:15px;padding-top:10px}
+.bill-total{color:var(--green)}
+.share-buttons{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 
-    .mini-table th {
-      color: var(--text-muted);
-      font-weight: 600;
-    }
+.fy-card{background:linear-gradient(135deg,var(--green-pale) 0%,var(--milk) 100%);border-left:4px solid var(--green)}
+.fy-stats{display:flex;justify-content:space-between;margin:8px 0;padding:8px;background:rgba(255,255,255,0.5);border-radius:8px;font-size:13px}
+.warning-box{background:var(--red-pale);border:1px solid var(--red);border-radius:8px;padding:8px;margin:8px 0;font-size:12px;color:var(--red)}
+.info-box{background:var(--blue-pale);border:1px solid var(--blue);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--blue);line-height:1.5}
 
-    .alert-info {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      margin-top: 8px;
-    }
-
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 65px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 500;
-      cursor: pointer;
-      background: none;
-      border: none;
-      flex: 1;
-      padding: 4px 0;
-    }
-
-    .nav-item span:first-child {
-      font-size: 18px;
-      margin-bottom: 2px;
-    }
-
-    .nav-item.active {
-      color: var(--primary);
-      font-weight: 700;
-    }
-  </style>
+.coop-rate-box{background:#E8F5E9;border:1px solid #4CAF50;border-radius:10px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.default-rate-box{background:var(--amber-pale);border:1px solid var(--amber);border-radius:10px;padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">🥛 DairyBook</div>
-    <button class="lang-btn" onclick="toggleLang()" id="btn-lang">हिंदी</button>
-  </header>
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+  <button class="lang-btn" onclick="setLanguage('hi')">हिंदी</button>
+</div>
 
-  <!-- SCREEN 1: ENTRY -->
-  <main class="screen active" id="screen-entry">
+<div class="topbar">
+  <div>
+    <div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:#fff">🥛 DairyBook</div>
+    <div class="sub">Milk Management <span class="fy-badge" id="fyBadge"></span></div>
+  </div>
+  <div class="topbar-right" id="todayDate"></div>
+</div>
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="screen-home">
+  <div class="sec-header" id="lbl-home-hdr">Today's Summary</div>
+  <div class="stat-grid">
+    <div class="stat-box green"><div class="stat-num" id="h-total">0 L</div><div class="stat-label" id="lbl-h-total">Total milk today</div></div>
+    <div class="stat-box amber"><div class="stat-num" id="h-sessions">0</div><div class="stat-label" id="lbl-h-sess">Sessions</div></div>
+    <div class="stat-box blue"><div class="stat-num" id="h-cow">0 L</div><div class="stat-label" id="lbl-h-cow">Cow milk</div></div>
+    <div class="stat-box brown"><div class="stat-num" id="h-buf">0 L</div><div class="stat-label" id="lbl-h-buf">Buffalo milk</div></div>
+  </div>
+  <div id="home-fat-banner"></div>
+  <div class="card"><div class="card-title">🌅 <span id="lbl-morning">Morning session</span></div><div id="home-morning-list"></div></div>
+  <div class="card"><div class="card-title">🌇 <span id="lbl-evening">Evening session</span></div><div id="home-evening-list"></div></div>
+  <button class="btn btn-primary btn-full" onclick="goTo('entry')" id="lbl-record-btn">➕ Record Milk Session</button>
+</div>
+
+<!-- ENTRY SCREEN -->
+<div class="screen" id="screen-entry">
+  <div class="sec-header" id="lbl-entry-hdr">Record Milk Session</div>
+  <div class="card">
+    <div class="form-row"><div class="form-label" id="lbl-date">Date</div><input type="date" class="form-input" id="entry-date" onchange="onDateOrSessionChange()"></div>
+    <div class="session-toggle">
+      <button class="active" id="btn-morning" onclick="setSession('morning')">🌅 <span id="lbl-s-morn">Morning</span></button>
+      <button id="btn-evening" onclick="setSession('evening')">🌇 <span id="lbl-s-eve">Evening</span></button>
+    </div>
+    <div class="form-row"><div class="form-label" id="lbl-person">Feeding Person</div><select class="form-select" id="entry-person"></select></div>
+  </div>
+  <div class="session-fat-box">
+    <div class="session-fat-title" id="lbl-session-fat">📊 Session Fat% Reading</div>
+    <div class="fat-input-row"><label>🐄 <span id="lbl-cow-fat-lbl">Cow fat%</span></label><input type="number" id="session-cow-fat" step="0.1" oninput="onFatInput()"></div>
+    <div class="fat-input-row"><label>🐃 <span id="lbl-buf-fat-lbl">Buffalo fat%</span></label><input type="number" id="session-buf-fat" step="0.1" oninput="onFatInput()"></div>
+  </div>
+  <div class="card"><div class="card-title">🐄 <span id="lbl-cow-entries">Cow animals — qty (L)</span></div><div id="cow-entries"></div><button class="btn btn-outline btn-sm" onclick="addAnimalRow('cow')" id="lbl-add-cow">+ Add cow</button></div>
+  <div class="card"><div class="card-title">🐃 <span id="lbl-buf-entries">Buffalo animals — qty (L)</span></div><div id="buffalo-entries"></div><button class="btn btn-outline btn-sm" onclick="addAnimalRow('buffalo')" id="lbl-add-buf">+ Add buffalo</button></div>
+  <button class="btn btn-primary btn-full" onclick="saveSession()" id="lbl-save-sess">✅ Save Session</button>
+</div>
+
+<!-- DISPATCH SCREEN -->
+<div class="screen" id="screen-clients">
+  <div class="sec-header" id="lbl-dispatch-hdr">Client Dispatch</div>
+  <div class="card">
+    <div class="card-title" id="lbl-dispatch-card">📋 Record dispatch</div>
+    <div class="form-row"><div class="form-label" id="lbl-d-date">Date</div><input type="date" class="form-input" id="dispatch-date" onchange="onDispatchDateChange()"></div>
+    <div class="session-toggle">
+      <button class="active" id="btn-d-morn" onclick="setDispatchSession('morning')">🌅 <span id="lbl-d-morn">Morning</span></button>
+      <button id="btn-d-eve" onclick="setDispatchSession('evening')">🌇 <span id="lbl-d-eve">Evening</span></button>
+    </div>
+    <div id="dispatch-fat-info"></div>
+    <div id="dispatch-client-rows"></div>
+    <button class="btn btn-primary btn-full" onclick="saveDispatch()" id="lbl-save-dispatch">✅ Save Dispatch</button>
+  </div>
+  <div class="divider"></div>
+  <div style="font-family:var(--font-head);font-size:15px;font-weight:600;color:var(--brown);margin-bottom:8px" id="lbl-client-list">👥 Clients</div>
+  <div id="client-list-display"></div>
+  <button class="btn btn-outline btn-full" onclick="showAddClient()" id="lbl-add-client-btn">+ Add new client</button>
+  <div id="add-client-form" style="display:none;margin-top:12px">
     <div class="card">
-      <h2 id="lbl-session-config">Session Configuration</h2>
-      <div class="form-group">
-        <label id="lbl-date">Date</label>
-        <input type="date" id="entry-date" onchange="onDateOrSessionChange()">
+      <div class="card-title" id="lbl-add-client-hdr">Add Client</div>
+      <div class="form-row"><div class="form-label" id="lbl-cl-name">Name</div><input type="text" class="form-input" id="cl-name"></div>
+      <div class="form-row"><div class="form-label" id="lbl-cl-phone">Phone</div><input type="tel" class="form-input" id="cl-phone"></div>
+      
+      <!-- Client Type Toggle -->
+      <div class="form-row"><div class="form-label" id="lbl-cl-type">Client Type</div>
+        <div class="client-type-toggle">
+          <button class="active bulk" id="cl-type-bulk" onclick="setClientTypeUI('bulk')">🏭 Bulk / Cooperative</button>
+          <button class="retail" id="cl-type-retail" onclick="setClientTypeUI('retail')">🏠 Retail / Regular</button>
+        </div>
+        <input type="hidden" id="cl-client-type" value="bulk">
       </div>
-      <div class="toggle-group">
-        <button class="toggle-btn active" id="btn-morning" onclick="setSession('morning')">🌅 <span id="lbl-morn">Morning</span></button>
-        <button class="toggle-btn" id="btn-evening" onclick="setSession('evening')">🌃 <span id="lbl-eve">Evening</span></button>
+      
+      <div id="bulk-milk-info" class="info-box">🏭 Bulk buyers take mix of cow + buffalo milk. Billed by fat% using cooperative rates.</div>
+      
+      <div id="retail-milk-row" style="display:none">
+        <div class="form-row"><div class="form-label" id="lbl-milk-type">Milk type</div>
+          <select class="form-select" id="cl-milk-type"><option value="cow">🐄 Cow</option><option value="buffalo">🐃 Buffalo</option></select>
+        </div>
+        <div class="info-box" style="background:var(--amber-pale);border-color:var(--amber);color:var(--amber)">🏠 Retail clients billed at flat ₹/litre rate.</div>
       </div>
+      
+      <div class="form-row"><div class="form-label" id="lbl-cl-qty">Daily qty (L)</div><input type="number" class="form-input" id="cl-qty" step="0.1"></div>
+      <button class="btn btn-primary btn-full" onclick="addClient()" id="lbl-add-cl-submit">Add Client</button>
     </div>
+  </div>
+</div>
 
-    <div class="card">
-      <h2 id="lbl-fat-rates">Fat Rates (per 10 Fat)</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-cow-fat-rate">Cow Fat Rate (₹)</label>
-          <input type="number" step="0.1" id="session-cow-fat" placeholder="e.g. 70" oninput="onFatInput()">
-        </div>
-        <div class="form-group">
-          <label id="lbl-buf-fat-rate">Buffalo Fat Rate (₹)</label>
-          <input type="number" step="0.1" id="session-buf-fat" placeholder="e.g. 100" oninput="onFatInput()">
-        </div>
-      </div>
-      <div class="alert-info" id="rate-calc-preview">
-        Enter session fat rates to preview basic distribution calculation equations.
-      </div>
+<!-- BILLING SCREEN -->
+<div class="screen" id="screen-billing">
+  <div class="sec-header" id="lbl-billing-hdr">Monthly Billing</div>
+  <div class="card">
+    <div class="card-title" id="lbl-gen-bill">📅 Generate Bill</div>
+    <div class="form-grid">
+      <div class="form-row"><div class="form-label" id="lbl-b-client">Client</div><select class="form-select" id="bill-client"><option value="" id="lbl-all-clients">All clients</option></select></div>
+      <div class="form-row"><div class="form-label" id="lbl-b-month">Month</div><input type="month" class="form-input" id="bill-month"></div>
     </div>
+    <button class="btn btn-amber btn-full" onclick="generateBill()" id="lbl-gen-bill-btn">🧾 Generate Bill</button>
+  </div>
+  <div id="bill-output"></div>
+</div>
 
-    <div class="card">
-      <h2 id="lbl-add-entry">Add Farmer Collection Entry</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-farmer-id">Farmer ID</label>
-          <input type="number" id="entry-id" placeholder="ID" oninput="onFarmerIdInput()">
-        </div>
-        <div class="form-group">
-          <label id="lbl-farmer-name">Farmer Name</label>
-          <input type="text" id="entry-name" readonly placeholder="Auto-loaded">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-animal-type">Animal Type</label>
-          <select id="entry-type" onchange="calculateEntryRow()">
-            <option value="cow" id="opt-cow">Cow</option>
-            <option value="buffalo" id="opt-buf">Buffalo</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label id="lbl-liters">Liters</label>
-          <input type="number" step="0.1" id="entry-liters" placeholder="0.0" oninput="calculateEntryRow()">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-measured-fat">Measured Fat</label>
-          <input type="number" step="0.1" id="entry-fat" placeholder="0.0" oninput="calculateEntryRow()">
-        </div>
-        <div class="form-group">
-          <label id="lbl-total-amt">Calculated Amount (₹)</label>
-          <input type="number" id="entry-amount" readonly placeholder="0.00">
-        </div>
-      </div>
-
-      <button class="btn btn-primary" id="btn-save-entry" onclick="saveRecordEntry()">Save Data Entry</button>
+<!-- AI SCREEN -->
+<div class="screen" id="screen-ai">
+  <div class="sec-header" id="lbl-ai-hdr">🤖 AI Assistant</div>
+  <div class="chip-row" id="quick-chips"></div>
+  <div class="chat-wrap">
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai"><div class="msg-bubble" id="lbl-ai-welcome">Namaste! 🙏 Ask me anything — bills, payments, milk production!</div><div class="msg-time">Now</div></div>
     </div>
-  </main>
-
-  <!-- SCREEN 2: DISPATCH -->
-  <main class="screen" id="screen-dispatch">
-    <div class="card">
-      <h2 id="lbl-dairy-dispatch">Dairy Factory Dispatch</h2>
-      <div class="form-group">
-        <label id="lbl-disp-date">Dispatch Date</label>
-        <input type="date" id="dispatch-date">
-      </div>
-      <div class="toggle-group">
-        <button class="toggle-btn active" id="btn-d-morn" onclick="setDispatchSession('morning')">🌅 <span id="lbl-d-morn-txt">Morning</span></button>
-        <button class="toggle-btn" id="btn-d-eve" onclick="setDispatchSession('evening')">🌃 <span id="lbl-d-eve-txt">Evening</span></button>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-disp-liters">Total Factory Liters</label>
-          <input type="number" step="0.1" id="disp-liters" placeholder="0.0">
-        </div>
-        <div class="form-group">
-          <label id="lbl-disp-fat">Factory Average Fat</label>
-          <input type="number" step="0.1" id="disp-fat" placeholder="0.0">
-        </div>
-      </div>
-      
-      <div class="form-group">
-        <label id="lbl-disp-rate">Factory Pay Rate (per 10 Fat) (₹)</label>
-        <input type="number" step="0.1" id="disp-rate" placeholder="e.g. 105">
-      </div>
-
-      <button class="btn btn-success" id="btn-save-dispatch" onclick="saveDispatchRecord()">Save Factory Dispatch</button>
+    <div class="chat-input-row">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">➤</button>
     </div>
-  </main>
+  </div>
+</div>
 
-  <!-- SCREEN 3: FARMERS -->
-  <main class="screen" id="screen-farmers">
-    <div class="card">
-      <h2 id="lbl-manage-farmers">Manage Farmers</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-new-id">New ID</label>
-          <input type="number" id="new-farmer-id" placeholder="ID">
-        </div>
-        <div class="form-group">
-          <label id="lbl-new-name">Farmer Name</label>
-          <input type="text" id="new-farmer-name" placeholder="Name">
-        </div>
-      </div>
-      <button class="btn btn-primary" id="btn-add-farmer" onclick="addFarmerProfile()">Add New Profile</button>
+<!-- SETUP SCREEN -->
+<div class="screen" id="screen-setup">
+  <div class="sec-header" id="lbl-setup-hdr">Setup</div>
+  
+  <!-- Cooperative Rates -->
+  <div class="card" style="border-left:4px solid #1B5E20">
+    <div class="card-title" id="lbl-coop-rates-hdr">🏭 Cooperative Rates (Bulk Billing)</div>
+    <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="lbl-coop-rates-info">For bulk/cooperative clients — fat% determines rate. Enter your milk union rate table.</div>
+    <div id="coop-rates-display"></div>
+    <div class="form-grid3" style="margin-top:10px">
+      <select class="form-select" id="cr-type"><option value="cow">Cow</option><option value="buffalo">Buffalo</option><option value="mix">Mix</option></select>
+      <input type="number" class="form-input" id="cr-fat" placeholder="Fat%" step="0.1">
+      <input type="number" class="form-input" id="cr-rate" placeholder="₹/L">
     </div>
+    <button class="btn btn-sm btn-full" style="background:#1B5E20;color:#fff;margin-top:8px" onclick="addCoopRate()" id="lbl-add-coop-btn">+ Add cooperative rate</button>
+  </div>
 
-    <div class="card">
-      <h2 id="lbl-farmer-directory">Registered Directory</h2>
-      <table class="mini-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th id="lbl-tbl-name">Name</th>
-          </tr>
-        </thead>
-        <tbody id="table-farmers-body"></tbody>
-       </table>
+  <!-- Retail Rates -->
+  <div class="card" style="border-left:4px solid var(--amber)">
+    <div class="card-title" id="lbl-retail-rates-hdr">🏠 Retail Rates (Default ₹/L)</div>
+    <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="lbl-retail-rates-info">For retail clients — flat rate per litre. No fat calculation.</div>
+    <div id="retail-rates-display"></div>
+    <div class="form-grid3" style="margin-top:10px">
+      <select class="form-select" id="rr-type"><option value="cow">🐄 Cow</option><option value="buffalo">🐃 Buffalo</option></select>
+      <input type="number" class="form-input" id="rr-rate" placeholder="₹/L" step="0.5">
+      <button class="btn btn-amber btn-sm" onclick="saveRetailRate()" id="lbl-save-retail-btn">Save</button>
     </div>
-  </main>
+  </div>
 
-  <!-- SCREEN 4: BILLING & REPORTS -->
-  <main class="screen" id="screen-billing">
-    <div class="card">
-      <h2 id="lbl-generate-bills">Generate Summary Invoices</h2>
-      <div class="form-row">
-        <div class="form-group">
-          <label id="lbl-start-date">Start Date</label>
-          <input type="date" id="bill-start">
-        </div>
-        <div class="form-group">
-          <label id="lbl-end-date">End Date</label>
-          <input type="date" id="bill-end">
-        </div>
-      </div>
-      <button class="btn btn-primary" id="btn-run-bill" onclick="generateBill()">Compile Dynamic Billings</button>
-    </div>
+  <!-- Google Sheets Connection -->
+  <div class="card">
+    <div class="card-title" id="lbl-sheets-hdr">📊 Google Sheets Backup</div>
+    <div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="lbl-sheets-info">Connect to Google Sheets for cloud backup & multi-device sync</div>
+    <input type="text" class="form-input" id="sheets-script-url" placeholder="Google Apps Script Web App URL">
+    <button class="btn btn-brown btn-full btn-sm" onclick="saveSheetsUrl()" style="margin-top:8px" id="lbl-sheets-btn">🔗 Connect Google Sheets</button>
+    <button class="btn btn-outline btn-full btn-sm" onclick="syncToSheets()" style="margin-top:8px" id="lbl-sync-btn">🔄 Sync to Sheets</button>
+    <div id="sheets-status" style="font-size:12px;margin-top:6px;color:var(--green)"></div>
+  </div>
 
-    <div id="billing-results-output"></div>
-  </main>
+  <!-- Fiscal Year -->
+  <div class="card fy-card">
+    <div class="card-title">📅 <span id="lbl-fy-hdr">Fiscal Year</span> <span style="background:var(--green);padding:2px 8px;border-radius:20px;font-size:10px;color:#fff" id="currentFyBadge"></span></div>
+    <div class="fy-stats"><div><strong id="lbl-fy-current">Current FY:</strong> <span id="displayCurrentFy">-</span></div><div><strong id="lbl-fy-start">Started:</strong> <span id="displayFyStart">-</span></div></div>
+    <div class="form-grid"><button class="btn btn-amber btn-sm" onclick="archiveCurrentData()" id="lbl-fy-archive-btn">📦 Archive & New FY</button><button class="btn btn-outline btn-sm" onclick="viewArchivedData()" id="lbl-fy-view-btn">📜 View Archived</button></div>
+  </div>
 
-  <!-- SCREEN 5: AI INTEGRATION LAYER -->
-  <main class="screen" id="screen-ai">
-    <div class="card">
-      <h2 id="lbl-ai-title">AI Profit Analytics</h2>
-      <p style="font-size:14px; color:var(--text-muted); margin-bottom:12px;" id="lbl-ai-desc">
-        Generate custom analytical payload prompts based on your inventory margins to feed into an LLM context window.
-      </p>
-      <button class="btn btn-purple" id="btn-build-prompt" onclick="generateAIPayload()">Compile AI Context Data</button>
-    </div>
+  <!-- Animals -->
+  <div class="card"><div class="card-title" id="lbl-animals-hdr">🐄 Animals</div><div id="animal-list-display"></div>
+    <div class="form-grid" style="margin-top:10px"><input type="text" class="form-input" id="an-name" placeholder="Animal name"><select class="form-select" id="an-type"><option value="cow">Cow</option><option value="buffalo">Buffalo</option></select></div>
+    <button class="btn btn-brown btn-full btn-sm" onclick="addAnimal()" id="lbl-add-animal-btn">+ Add animal</button>
+  </div>
 
-    <div class="card" id="ai-prompt-box" style="display:none;">
-      <label style="color:var(--purple); font-weight:700;">Copy and Paste Prompt Context into ChatGPT/Gemini:</label>
-      <textarea id="ai-textarea" rows="10" style="font-family:monospace; font-size:12px; margin-top:6px;" readonly></textarea>
-    </div>
-  </main>
+  <!-- Persons -->
+  <div class="card"><div class="card-title" id="lbl-persons-hdr">👤 Feeding Persons</div><div id="person-list-display"></div>
+    <div class="form-grid" style="margin-top:10px"><input type="text" class="form-input" id="ps-name" placeholder="Person name"><input type="tel" class="form-input" id="ps-phone" placeholder="Phone"></div>
+    <button class="btn btn-brown btn-full btn-sm" onclick="addPerson()" id="lbl-add-person-btn">+ Add person</button>
+  </div>
 
-  <!-- SCREEN 6: SETUP & SYSTEM DEFAULTS -->
-  <main class="screen" id="screen-setup">
-    <div class="card">
-      <h2 id="lbl-system-setup">System Administration Tools</h2>
-      <p style="font-size:14px; color:var(--text-muted); margin-bottom:14px;" id="lbl-setup-desc">
-        Perform sandbox database routines or reset browser-cached transaction ledgers.
-      </p>
-      <button class="btn btn-success" id="btn-load-demo" onclick="loadSandboxDemoData()">Load Sandbox Demo Records</button>
-      <button class="btn btn-outline-danger" id="btn-clear-db" onclick="wipeLocalDatabase()">Wipe Entire Local Database</button>
-    </div>
-  </main>
+  <!-- AI API Key -->
+  <div class="card"><div class="card-title" id="lbl-api-hdr">🔑 AI API Key (OpenRouter)</div><div style="font-size:12px;color:var(--text-soft);margin-bottom:8px" id="lbl-api-info">Free AI — get key at openrouter.ai</div>
+    <input type="password" class="form-input" id="api-key-input" placeholder="sk-or-v1-...">
+    <button class="btn btn-brown btn-full btn-sm" onclick="saveApiKey()" id="lbl-save-api-btn">Save API Key</button>
+    <div id="api-key-status" style="font-size:12px;margin-top:6px"></div>
+  </div>
 
-  <nav>
-    <button class="nav-item active" id="nav-entry" onclick="switchTab('entry')">
-      <span>📥</span><span id="lbl-nav-entry">Entry</span>
-    </button>
-    <button class="nav-item" id="nav-dispatch" onclick="switchTab('dispatch')">
-      <span>🚚</span><span id="lbl-nav-disp">Dispatch</span>
-    </button>
-    <button class="nav-item" id="nav-farmers" onclick="switchTab('farmers')">
-      <span>👥</span><span id="lbl-nav-farm">Farmers</span>
-    </button>
-    <button class="nav-item" id="nav-billing" onclick="switchTab('billing')">
-      <span>📄</span><span id="lbl-nav-bill">Billing</span>
-    </button>
-    <button class="nav-item" id="nav-ai" onclick="switchTab('ai')">
-      <span>✨</span><span id="lbl-nav-ai">AI Insights</span>
-    </button>
-    <button class="nav-item" id="nav-setup" onclick="switchTab('setup')">
-      <span>⚙️</span><span id="lbl-nav-setup">Setup</span>
-    </button>
-  </nav>
+  <!-- Data Management -->
+  <div class="card"><div class="card-title" style="color:var(--red)" id="lbl-data-hdr">⚠️ Data</div>
+    <button class="btn btn-outline btn-full btn-sm" onclick="exportData()" id="lbl-export-btn">📤 Export JSON</button>
+    <button class="btn btn-outline btn-full btn-sm" onclick="loadSampleData()" id="lbl-sample-btn">🎯 Load sample data</button>
+    <button class="btn btn-danger btn-full btn-sm" onclick="resetAllData()" id="lbl-reset-btn">⚠️ Reset All Data</button>
+  </div>
+</div>
 
-  <script>
-    // ==================== LANGUAGE SYSTEM ====================
-    let lang = localStorage.getItem('dairy_lang') || 'en';
-    
-    const T = {
-      en: {
-        'btn-lang': 'हिंदी',
-        'lbl-session-config': 'Session Configuration',
-        'lbl-date': 'Date',
-        'lbl-morn': 'Morning',
-        'lbl-eve': 'Evening',
-        'lbl-fat-rates': 'Fat Rates (per 10 Fat)',
-        'lbl-cow-fat-rate': 'Cow Fat Rate (₹)',
-        'lbl-buf-fat-rate': 'Buffalo Fat Rate (₹)',
-        'lbl-add-entry': 'Add Farmer Collection Entry',
-        'lbl-farmer-id': 'Farmer ID',
-        'lbl-farmer-name': 'Farmer Name',
-        'lbl-animal-type': 'Animal Type',
-        'opt-cow': 'Cow',
-        'opt-buf': 'Buffalo',
-        'lbl-liters': 'Liters',
-        'lbl-measured-fat': 'Measured Fat',
-        'lbl-total-amt': 'Calculated Amount (₹)',
-        'btn-save-entry': 'Save Data Entry',
-        'lbl-dairy-dispatch': 'Dairy Factory Dispatch',
-        'lbl-disp-date': 'Dispatch Date',
-        'lbl-d-morn-txt': 'Morning',
-        'lbl-d-eve-txt': 'Evening',
-        'lbl-disp-liters': 'Total Factory Liters',
-        'lbl-disp-fat': 'Factory Average Fat',
-        'lbl-disp-rate': 'Factory Pay Rate (per 10 Fat) (₹)',
-        'btn-save-dispatch': 'Save Factory Dispatch',
-        'lbl-manage-farmers': 'Manage Farmers',
-        'lbl-new-id': 'New ID',
-        'lbl-new-name': 'Farmer Name',
-        'btn-add-farmer': 'Add New Profile',
-        'lbl-farmer-directory': 'Registered Directory',
-        'lbl-tbl-name': 'Name',
-        'lbl-generate-bills': 'Generate Summary Invoices',
-        'lbl-start-date': 'Start Date',
-        'lbl-end-date': 'End Date',
-        'btn-run-bill': 'Compile Dynamic Billings',
-        'lbl-ai-title': 'AI Profit Analytics',
-        'lbl-ai-desc': 'Generate custom analytical payload prompts based on your inventory margins to feed into an LLM context window.',
-        'btn-build-prompt': 'Compile AI Context Data',
-        'lbl-system-setup': 'System Administration Tools',
-        'lbl-setup-desc': 'Perform sandbox database routines or reset browser-cached transaction ledgers.',
-        'btn-load-demo': 'Load Sandbox Demo Records',
-        'btn-clear-db': 'Wipe Entire Local Database',
-        'lbl-nav-entry': 'Entry',
-        'lbl-nav-disp': 'Dispatch',
-        'lbl-nav-farm': 'Farmers',
-        'lbl-nav-bill': 'Billing',
-        'lbl-nav-ai': 'AI Insights',
-        'lbl-nav-setup': 'Setup'
-      },
-      hi: {
-        'btn-lang': 'English',
-        'lbl-session-config': 'सत्र कॉन्फ़िगरेशन',
-        'lbl-date': 'तारीख',
-        'lbl-morn': 'सुबह',
-        'lbl-eve': 'शाम',
-        'lbl-fat-rates': 'फैट दरें (प्रति 10 फैट)',
-        'lbl-cow-fat-rate': 'गाय फैट दर (₹)',
-        'lbl-buf-fat-rate': 'भैंस फैट दर (₹)',
-        'lbl-add-entry': 'किसान संग्रह प्रविष्टि जोड़ें',
-        'lbl-farmer-id': 'किसान आईडी',
-        'lbl-farmer-name': 'किसान का नाम',
-        'lbl-animal-type': 'पशु का प्रकार',
-        'opt-cow': 'गाय',
-        'opt-buf': 'भैंस',
-        'lbl-liters': 'लीटर',
-        'lbl-measured-fat': 'मापा गया फैट',
-        'lbl-total-amt': 'कुल राशि (₹)',
-        'btn-save-entry': 'प्रविष्टि सुरक्षित करें',
-        'lbl-dairy-dispatch': 'डेयरी फैक्ट्री डिस्पैच',
-        'lbl-disp-date': 'डिस्पैच तारीख',
-        'lbl-d-morn-txt': 'सुबह',
-        'lbl-d-eve-txt': 'शाम',
-        'lbl-disp-liters': 'कुल फैक्ट्री लीटर',
-        'lbl-disp-fat': 'फैक्ट्री औसत फैट',
-        'lbl-disp-rate': 'फैक्ट्री भुगतान दर (प्रति 10 फैट) (₹)',
-        'btn-save-dispatch': 'फैक्ट्री डिस्पैच सुरक्षित करें',
-        'lbl-manage-farmers': 'किसानों को प्रबंधित करें',
-        'lbl-new-id': 'नई आईडी',
-        'lbl-new-name': 'किसान का नाम',
-        'btn-add-farmer': 'नया प्रोफाइल जोड़ें',
-        'lbl-farmer-directory': 'पंजीकृत डायरेक्टरी',
-        'lbl-tbl-name': 'नाम',
-        'lbl-generate-bills': 'खाता सारांश बिल बनाएं',
-        'lbl-start-date': 'प्रारंभ तिथि',
-        'lbl-end-date': 'अंतिम तिथि',
-        'btn-run-bill': 'बिल संकलित करें',
-        'lbl-ai-title': 'एआई लाभ विश्लेषण',
-        'lbl-ai-desc': 'एक एलएलएम संदर्भ विंडो में फ़ीड करने के लिए अपने इन्वेंट्री मार्जिन के आधार पर कस्टम विश्लेषणात्मक पेलोड प्रॉम्प्ट जेनरेट करें।',
-        'btn-build-prompt': 'एआई संदर्भ डेटा संकलित करें',
-        'lbl-system-setup': 'प्रणाली प्रशासन उपकरण',
-        'lbl-setup-desc': 'सैंडबॉक्स डेटाबेस रूटीन निष्पादित करें या ब्राउज़र-कैश किए गए लेनदेन बही को रीसेट करें।',
-        'btn-load-demo': 'सैंडबॉक्स डेमो रिकॉर्ड लोड करें',
-        'btn-clear-db': 'स्थानीय डेटाबेस साफ करें',
-        'lbl-nav-entry': 'एंट्री',
-        'lbl-nav-disp': 'डिस्पैच',
-        'lbl-nav-farm': 'किसान',
-        'lbl-nav-bill': 'बिलिंग',
-        'lbl-nav-ai': 'एआई विश्लेषण',
-        'lbl-nav-setup': 'सेटअप'
-      }
-    };
+<div class="bottomnav">
+  <button class="bnav-item active" onclick="goTo('home')"><div class="icon">🏠</div><div class="label" id="nav-home">Home</div></button>
+  <button class="bnav-item" onclick="goTo('entry')"><div class="icon">🥛</div><div class="label" id="nav-entry">Entry</div></button>
+  <button class="bnav-item" onclick="goTo('clients')"><div class="icon">👥</div><div class="label" id="nav-dispatch">Dispatch</div></button>
+  <button class="bnav-item" onclick="goTo('billing')"><div class="icon">🧾</div><div class="label" id="nav-bills">Bills</div></button>
+  <button class="bnav-item" onclick="goTo('ai')"><div class="icon">🤖</div><div class="label" id="nav-ai">AI</div></button>
+  <button class="bnav-item" onclick="goTo('setup')"><div class="icon">⚙️</div><div class="label" id="nav-setup">Setup</div></button>
+</div>
 
-    function toggleLang() {
-      lang = lang === 'en' ? 'hi' : 'en';
-      localStorage.setItem('dairy_lang', lang);
-      setLanguage();
-    }
+<div class="toast" id="toast"></div>
 
-    function setLanguage() {
-      const dict = T[lang];
-      for (let key in dict) {
-        const el = document.getElementById(key);
-        if (el) el.textContent = dict[key];
-      }
-      // Update placeholder for AI textarea after language change
-      if (document.getElementById('ai-prompt-box').style.display === 'block') {
-        generateAIPayload();
-      }
-    }
+<script>
+// ==================== LANGUAGE SYSTEM ====================
+let currentLang = localStorage.getItem('dairy_lang') || 'en';
+let googleSheetsUrl = localStorage.getItem('google_sheets_url') || '';
 
-    // ==================== DATABASE ====================
-    let DB = { farmers: {}, rates: {}, entries: [], dispatch: [] };
+const translations = {
+  en: {
+    'lbl-home-hdr':"Today's Summary",'lbl-h-total':'Total milk today','lbl-h-sess':'Sessions',
+    'lbl-h-cow':'Cow milk','lbl-h-buf':'Buffalo milk','lbl-morning':'Morning session',
+    'lbl-evening':'Evening session','lbl-record-btn':'➕ Record Milk Session',
+    'lbl-entry-hdr':'Record Milk Session','lbl-date':'Date','lbl-s-morn':'Morning','lbl-s-eve':'Evening',
+    'lbl-person':'Feeding Person','lbl-session-fat':'📊 Session Fat% Reading',
+    'lbl-cow-fat-lbl':'Cow fat%','lbl-buf-fat-lbl':'Buffalo fat%',
+    'lbl-cow-entries':'Cow animals — qty (L)','lbl-buf-entries':'Buffalo animals — qty (L)',
+    'lbl-add-cow':'+ Add cow','lbl-add-buf':'+ Add buffalo','lbl-save-sess':'✅ Save Session',
+    'lbl-dispatch-hdr':'Client Dispatch','lbl-dispatch-card':'📋 Record dispatch','lbl-d-date':'Date',
+    'lbl-d-morn':'Morning','lbl-d-eve':'Evening','lbl-save-dispatch':'✅ Save Dispatch',
+    'lbl-client-list':'👥 Clients','lbl-add-client-btn':'+ Add new client','lbl-add-client-hdr':'Add Client',
+    'lbl-cl-name':'Name','lbl-cl-phone':'Phone','lbl-cl-type':'Client Type','lbl-milk-type':'Milk type',
+    'lbl-cl-qty':'Daily qty (L)','lbl-add-cl-submit':'Add Client',
+    'lbl-billing-hdr':'Monthly Billing','lbl-gen-bill':'📅 Generate Bill','lbl-b-client':'Client',
+    'lbl-all-clients':'All clients','lbl-b-month':'Month','lbl-gen-bill-btn':'🧾 Generate Bill',
+    'lbl-ai-hdr':'🤖 AI Assistant','lbl-ai-welcome':'Namaste! 🙏 Ask me anything!',
+    'lbl-setup-hdr':'Setup','lbl-coop-rates-hdr':'🏭 Cooperative Rates','lbl-coop-rates-info':'For bulk/cooperative clients — fat% determines rate.',
+    'lbl-add-coop-btn':'+ Add cooperative rate','lbl-retail-rates-hdr':'🏠 Retail Rates',
+    'lbl-retail-rates-info':'For retail clients — flat rate per litre.',
+    'lbl-save-retail-btn':'Save','lbl-sheets-hdr':'📊 Google Sheets Backup',
+    'lbl-sheets-info':'Connect to Google Sheets for cloud backup & multi-device sync',
+    'lbl-sheets-btn':'🔗 Connect Google Sheets','lbl-sync-btn':'🔄 Sync to Sheets',
+    'lbl-fy-hdr':'Fiscal Year','lbl-fy-current':'Current FY:','lbl-fy-start':'Started:',
+    'lbl-fy-archive-btn':'📦 Archive & New FY','lbl-fy-view-btn':'📜 View Archived',
+    'lbl-animals-hdr':'🐄 Animals','lbl-add-animal-btn':'+ Add animal','lbl-persons-hdr':'👤 Feeding Persons',
+    'lbl-add-person-btn':'+ Add person','lbl-api-hdr':'🔑 AI API Key','lbl-api-info':'Free AI — get key at openrouter.ai',
+    'lbl-save-api-btn':'Save API Key','lbl-data-hdr':'⚠️ Data','lbl-export-btn':'📤 Export JSON',
+    'lbl-sample-btn':'🎯 Load sample data','lbl-reset-btn':'⚠️ Reset All Data',
+    'nav-home':'Home','nav-entry':'Entry','nav-dispatch':'Dispatch','nav-bills':'Bills','nav-ai':'AI','nav-setup':'Setup'
+  },
+  hi: {
+    'lbl-home-hdr':'आज का सारांश','lbl-h-total':'आज का कुल दूध','lbl-h-sess':'सत्र',
+    'lbl-h-cow':'गाय का दूध','lbl-h-buf':'भैंस का दूध','lbl-morning':'🌅 सुबह का सत्र',
+    'lbl-evening':'🌇 शाम का सत्र','lbl-record-btn':'➕ दूध सत्र दर्ज करें',
+    'lbl-entry-hdr':'दूध सत्र दर्ज करें','lbl-date':'तारीख','lbl-s-morn':'सुबह','lbl-s-eve':'शाम',
+    'lbl-person':'दूध देने वाला','lbl-session-fat':'📊 सत्र वसा% रीडिंग',
+    'lbl-cow-fat-lbl':'गाय वसा%','lbl-buf-fat-lbl':'भैंस वसा%',
+    'lbl-cow-entries':'गाय — मात्रा (L)','lbl-buf-entries':'भैंस — मात्रा (L)',
+    'lbl-add-cow':'+ गाय जोड़ें','lbl-add-buf':'+ भैंस जोड़ें','lbl-save-sess':'✅ सत्र सहेजें',
+    'lbl-dispatch-hdr':'ग्राहक वितरण','lbl-dispatch-card':'📋 वितरण दर्ज करें','lbl-d-date':'तारीख',
+    'lbl-d-morn':'सुबह','lbl-d-eve':'शाम','lbl-save-dispatch':'✅ वितरण सहेजें',
+    'lbl-client-list':'👥 ग्राहक','lbl-add-client-btn':'+ नया ग्राहक','lbl-add-client-hdr':'ग्राहक जोड़ें',
+    'lbl-cl-name':'नाम','lbl-cl-phone':'फोन','lbl-cl-type':'ग्राहक प्रकार','lbl-milk-type':'दूध प्रकार',
+    'lbl-cl-qty':'दैनिक मात्रा','lbl-add-cl-submit':'जोड़ें',
+    'lbl-billing-hdr':'मासिक बिलिंग','lbl-gen-bill':'📅 बिल बनाएं','lbl-b-client':'ग्राहक',
+    'lbl-all-clients':'सभी ग्राहक','lbl-b-month':'माह','lbl-gen-bill-btn':'🧾 बिल बनाएं',
+    'lbl-ai-hdr':'🤖 AI सहायक','lbl-ai-welcome':'नमस्ते! 🙏 कुछ भी पूछें!',
+    'lbl-setup-hdr':'सेटअप','lbl-coop-rates-hdr':'🏭 सहकारी दरें','lbl-coop-rates-info':'थोक ग्राहकों के लिए — वसा% से दर।',
+    'lbl-add-coop-btn':'+ सहकारी दर जोड़ें','lbl-retail-rates-hdr':'🏠 खुदरा दरें',
+    'lbl-retail-rates-info':'खुदरा ग्राहकों के लिए — प्रति लीटर सीधी दर।',
+    'lbl-save-retail-btn':'सेव','lbl-sheets-hdr':'📊 गूगल शीट्स बैकअप',
+    'lbl-sheets-info':'क्लाउड बैकअप के लिए गूगल शीट्स से कनेक्ट करें',
+    'lbl-sheets-btn':'🔗 कनेक्ट करें','lbl-sync-btn':'🔄 सिंक करें',
+    'lbl-fy-hdr':'वित्तीय वर्ष','lbl-fy-current':'वर्तमान:','lbl-fy-start':'शुरू:',
+    'lbl-fy-archive-btn':'📦 आर्काइव और नया','lbl-fy-view-btn':'📜 पुराना देखें',
+    'lbl-animals-hdr':'🐄 पशु','lbl-add-animal-btn':'+ पशु जोड़ें','lbl-persons-hdr':'👤 दूध देने वाले',
+    'lbl-add-person-btn':'+ व्यक्ति जोड़ें','lbl-api-hdr':'🔑 AI कुंजी','lbl-api-info':'मुफ्त AI — openrouter.ai पर कुंजी लें',
+    'lbl-save-api-btn':'सेव करें','lbl-data-hdr':'⚠️ डेटा','lbl-export-btn':'📤 JSON निर्यात',
+    'lbl-sample-btn':'🎯 नमूना डेटा','lbl-reset-btn':'⚠️ रीसेट करें',
+    'nav-home':'होम','nav-entry':'प्रविष्टि','nav-dispatch':'वितरण','nav-bills':'बिल','nav-ai':'AI','nav-setup':'सेटअप'
+  }
+};
 
-    function loadLocalStorageEngine() {
-      const stored = localStorage.getItem('dairybook_db_v1');
-      if (stored) {
-        try { DB = JSON.parse(stored); } catch(e) { console.error(e); }
-      }
-      if (!DB.farmers) DB.farmers = {};
-      if (!DB.rates) DB.rates = {};
-      if (!DB.entries) DB.entries = [];
-      if (!DB.dispatch) DB.dispatch = [];
-    }
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('dairy_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  if(event && event.target) event.target.classList.add('active');
+  else document.querySelector('.lang-btn').classList.add('active');
+  const tr = translations[lang];
+  for(let key in tr) {
+    const el = document.getElementById(key);
+    if(el) el.textContent = tr[key];
+  }
+  renderAll();
+}
 
-    function syncStorage() {
-      localStorage.setItem('dairybook_db_v1', JSON.stringify(DB));
-    }
+// ==================== DATABASE ====================
+const DB = {
+  get: k => { try { return JSON.parse(localStorage.getItem('dairy_'+k)) || []; } catch(e){ return []; } },
+  set: (k,v) => localStorage.setItem('dairy_'+k, JSON.stringify(v)),
+  getObj: k => { try { return JSON.parse(localStorage.getItem('dairy_'+k)) || {}; } catch(e){ return {}; } },
+  setObj: (k,v) => localStorage.setItem('dairy_'+k, JSON.stringify(v))
+};
 
-    function today() {
-      return new Date().toISOString().split('T')[0];
-    }
+const getAnimals = () => DB.get('animals');
+const getPersons = () => DB.get('persons');
+const getClients = () => DB.get('clients');
+const getSessions = () => DB.get('sessions');
+const getDispatches = () => DB.get('dispatches');
+const getFatRates = () => DB.get('fat_rates');
+const getRetailRates = () => DB.getObj('retail_rates');
+const getApiKey = () => localStorage.getItem('openrouter_api_key') || '';
 
-    // ==================== TAB NAVIGATION ====================
-    function switchTab(tabId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      document.getElementById(`screen-${tabId}`).classList.add('active');
-      document.getElementById(`nav-${tabId}`).classList.add('active');
+const saveAnimals = v => DB.set('animals', v);
+const savePersons = v => DB.set('persons', v);
+const saveClients = v => DB.set('clients', v);
+const saveSessions = v => DB.set('sessions', v);
+const saveDispatches = v => DB.set('dispatches', v);
+const saveFatRates = v => DB.set('fat_rates', v);
+const saveRetailRates = v => DB.setObj('retail_rates', v);
 
-      if (tabId === 'farmers') renderFarmersList();
-    }
+// ==================== GOOGLE SHEETS SYNC ====================
+function saveSheetsUrl() {
+  const url = document.getElementById('sheets-script-url').value.trim();
+  if(url) {
+    localStorage.setItem('google_sheets_url', url);
+    googleSheetsUrl = url;
+    document.getElementById('sheets-status').innerHTML = '✅ ' + (currentLang === 'hi' ? 'कनेक्टेड' : 'Connected');
+    toast(currentLang === 'hi' ? 'गूगल शीट्स यूआरएल सहेजा गया' : 'Google Sheets URL saved');
+  }
+}
 
-    // ==================== ENTRY LOGIC ====================
-    let currentSession = 'morning';
-    
-    function setSession(s) {
-      currentSession = s;
-      document.getElementById('btn-morning').classList.toggle('active', s === 'morning');
-      document.getElementById('btn-evening').classList.toggle('active', s === 'evening');
-      onDateOrSessionChange();
-    }
+async function syncToSheets() {
+  if(!googleSheetsUrl) {
+    toast(currentLang === 'hi' ? 'पहले गूगल शीट्स यूआरएल सेट करें' : 'First set Google Sheets URL');
+    return;
+  }
+  const data = {
+    animals: getAnimals(), persons: getPersons(), clients: getClients(),
+    sessions: getSessions(), dispatches: getDispatches(), fat_rates: getFatRates(),
+    retail_rates: getRetailRates(), timestamp: new Date().toISOString()
+  };
+  try {
+    await fetch(googleSheetsUrl, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    toast(currentLang === 'hi' ? '✅ डेटा सिंक शुरू किया गया' : '✅ Data sync initiated');
+  } catch(e) {
+    toast(currentLang === 'hi' ? '❌ सिंक विफल' : '❌ Sync failed');
+  }
+}
 
-    function onDateOrSessionChange() {
-      const date = document.getElementById('entry-date').value || today();
-      const key = `${date}_${currentSession}`;
-      const sessionConfig = DB.rates[key] || { cow: '', buffalo: '' };
-      
-      document.getElementById('session-cow-fat').value = sessionConfig.cow || '';
-      document.getElementById('session-buf-fat').value = sessionConfig.buffalo || '';
-      
-      onFatInput();
-      clearEntryInputs();
-    }
+// ==================== HELPER FUNCTIONS ====================
+function today() { return new Date().toISOString().split('T')[0]; }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function fmtMoney(n) { return '₹' + parseFloat(n||0).toFixed(2); }
+function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 
-    function onFatInput() {
-      const date = document.getElementById('entry-date').value || today();
-      const cowRate = parseFloat(document.getElementById('session-cow-fat').value) || 0;
-      const bufRate = parseFloat(document.getElementById('session-buf-fat').value) || 0;
-      
-      const key = `${date}_${currentSession}`;
-      DB.rates[key] = { cow: cowRate, buffalo: bufRate };
-      syncStorage();
+// ==================== COOPERATIVE RATES ====================
+function addCoopRate() {
+  const type=document.getElementById('cr-type').value, fat=parseFloat(document.getElementById('cr-fat').value), rate=parseFloat(document.getElementById('cr-rate').value);
+  if(!fat||!rate){toast('Enter fat% and rate');return;}
+  const rates=getFatRates(); rates.push({id:genId(),milk_type:type,fat,rate});
+  saveFatRates(rates.sort((a,b)=>a.fat-b.fat));
+  document.getElementById('cr-fat').value=''; document.getElementById('cr-rate').value='';
+  renderCoopRates(); toast('Rate added'); syncToSheets();
+}
+function deleteCoopRate(id){saveFatRates(getFatRates().filter(r=>r.id!==id)); renderCoopRates();}
+function getCoopRate(milkType,fat){const rates=getFatRates().filter(r=>r.milk_type===milkType).sort((a,b)=>a.fat-b.fat); if(!rates.length)return 0; for(let r of rates){if(fat<=r.fat) return r.rate;} return rates[rates.length-1].rate;}
+function renderCoopRates(){const rates=getFatRates(); const el=document.getElementById('coop-rates-display'); if(!el)return; if(!rates.length){el.innerHTML='<div style="font-size:13px;color:var(--text-soft)">No cooperative rates yet</div>';return;} el.innerHTML=rates.map(r=>`<div class="coop-rate-box"><span class="badge badge-${r.milk_type}">${r.milk_type}</span><span>${r.fat}%</span><strong>₹${r.rate}/L</strong><button class="btn btn-outline btn-sm" onclick="deleteCoopRate('${r.id}')">✕</button></div>`).join('');}
 
-      const preview = document.getElementById('rate-calc-preview');
-      if (cowRate > 0 || bufRate > 0) {
-        preview.innerHTML = `<strong>Calculated Yield Formula Reference Matrix:</strong><br>` +
-          `🐄 Cow: 1 Liter @ 4.0 Fat = ₹${((cowRate / 10) * 4).toFixed(2)}<br>` +
-          `🦬 Buffalo: 1 Liter @ 6.5 Fat = ₹${((bufRate / 10) * 6.5).toFixed(2)}`;
-      } else {
-        preview.innerHTML = lang === 'en' ? "Enter session fat rates to preview basic distribution calculation equations." : "बुनियादी वितरण गणना समीकरणों का पूर्वावलोकन करने के लिए सत्र वसा दरें दर्ज करें।";
-      }
-      calculateEntryRow();
-    }
+// ==================== RETAIL RATES ====================
+function saveRetailRate(){const type=document.getElementById('rr-type').value, rate=parseFloat(document.getElementById('rr-rate').value); if(!rate){toast('Enter rate');return;} const rates=getRetailRates(); rates[type]=rate; saveRetailRates(rates); document.getElementById('rr-rate').value=''; renderRetailRates(); toast('Retail rate saved'); syncToSheets();}
+function renderRetailRates(){const rates=getRetailRates(); const el=document.getElementById('retail-rates-display'); if(!el)return; el.innerHTML=`<div class="default-rate-box"><span>🐄 Cow</span><strong>${rates.cow?`₹${rates.cow}/L`:'Not set'}</strong></div><div class="default-rate-box"><span>🐃 Buffalo</span><strong>${rates.buffalo?`₹${rates.buffalo}/L`:'Not set'}</strong></div>`;}
 
-    function onFarmerIdInput() {
-      const id = document.getElementById('entry-id').value;
-      const nameField = document.getElementById('entry-name');
-      if (id && DB.farmers[id]) {
-        nameField.value = DB.farmers[id];
-      } else {
-        nameField.value = '';
-      }
-    }
+// ==================== FISCAL YEAR ====================
+function getCurrentFiscalYear(){const d=new Date(),y=d.getFullYear(),m=d.getMonth()+1; return m>=4?`${y}-${(y+1).toString().slice(-2)}`:`${y-1}-${y.toString().slice(-2)}`;}
+function updateFiscalYearDisplay(){const cur=getCurrentFiscalYear(),saved=localStorage.getItem('current_fiscal_year')||cur; document.getElementById('displayCurrentFy').textContent=saved; document.getElementById('currentFyBadge').textContent=saved; document.getElementById('fyBadge').textContent=saved; document.getElementById('displayFyStart').textContent=`${parseInt(saved.split('-')[0])}-04-01`;}
+function archiveCurrentData(){if(!confirm('Archive current data?'))return; const oldFy=localStorage.getItem('current_fiscal_year')||getCurrentFiscalYear(); localStorage.setItem('dairy_archive_'+oldFy,JSON.stringify({sessions:getSessions(),dispatches:getDispatches()})); saveSessions([]); saveDispatches([]); localStorage.setItem('current_fiscal_year',getCurrentFiscalYear()); toast('Archived! Starting fresh.'); updateFiscalYearDisplay(); renderHome();}
+function viewArchivedData(){const a=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k&&k.startsWith('dairy_archive_'))a.push(k.replace('dairy_archive_',''));} alert(a.length?`Archived years: ${a.join(', ')}`:'No archives yet');}
 
-    function calculateEntryRow() {
-      const type = document.getElementById('entry-type').value;
-      const liters = parseFloat(document.getElementById('entry-liters').value) || 0;
-      const fat = parseFloat(document.getElementById('entry-fat').value) || 0;
-      
-      const date = document.getElementById('entry-date').value || today();
-      const key = `${date}_${currentSession}`;
-      const rates = DB.rates[key] || { cow: 0, buffalo: 0 };
-      
-      const baseRate = type === 'cow' ? (rates.cow || 0) : (rates.buffalo || 0);
-      const calculatedAmount = liters * (baseRate / 10) * fat;
-      
-      document.getElementById('entry-amount').value = calculatedAmount > 0 ? calculatedAmount.toFixed(2) : '0.00';
-    }
+// ==================== SESSION & ENTRY ====================
+function getSessionFat(date,session,milkType){const sess=getSessions().find(s=>s.date===date && s.session===session && s.milkType===milkType); return sess?(sess.fat||0):0;}
 
-    function saveRecordEntry() {
-      const id = document.getElementById('entry-id').value;
-      const date = document.getElementById('entry-date').value || today();
-      const type = document.getElementById('entry-type').value;
-      const liters = parseFloat(document.getElementById('entry-liters').value) || 0;
-      const fat = parseFloat(document.getElementById('entry-fat').value) || 0;
-      const amt = parseFloat(document.getElementById('entry-amount').value) || 0;
+let currentSession='morning', extraCows=[], extraBufs=[];
 
-      if (!id || !DB.farmers[id]) {
-        alert(lang === 'en' ? "Please verify Farmer profile ID mapping assignment!" : "कृपया किसान आईडी प्रोफाइल की जांच करें!");
-        return;
-      }
-      if (liters <= 0 || fat <= 0) {
-        alert(lang === 'en' ? "Values must exceed baseline numeric value 0!" : "मान 0 से अधिक होना चाहिए!");
-        return;
-      }
+function setSession(s){currentSession=s; document.getElementById('btn-morning').classList.toggle('active',s==='morning'); document.getElementById('btn-evening').classList.toggle('active',s==='evening'); onDateOrSessionChange();}
+function onDateOrSessionChange(){const date=document.getElementById('entry-date').value||today(); document.getElementById('session-cow-fat').value=getSessionFat(date,currentSession,'cow')||''; document.getElementById('session-buf-fat').value=getSessionFat(date,currentSession,'buffalo')||''; renderAnimalRows();}
+function onFatInput(){}
+function renderAnimalRows(){const animals=getAnimals(); renderRows([...animals.filter(a=>a.type==='cow'),...extraCows],'cow-entries','cow'); renderRows([...animals.filter(a=>a.type==='buffalo'),...extraBufs],'buffalo-entries','buffalo');}
+function renderRows(animals,containerId,type){const el=document.getElementById(containerId); if(!animals.length){el.innerHTML='<div style="font-size:12px;color:var(--text-soft)">No animals added. Go to Setup.</div>'; return;} el.innerHTML=animals.map(a=>`<div style="display:flex;gap:8px;margin-bottom:8px"><div style="font-size:13px;font-weight:600;min-width:80px">${a.name}</div><input type="number" class="form-input" id="qty-${type}-${a.id}" placeholder="Litres" step="0.1"></div>`).join('');}
+function addAnimalRow(type){const name=prompt('Animal name:'); if(!name)return; const id='tmp_'+genId(); if(type==='cow')extraCows.push({id,name,type:'cow'}); else extraBufs.push({id,name,type:'buffalo'}); renderAnimalRows();}
+function saveSession(){const date=document.getElementById('entry-date').value,personId=document.getElementById('entry-person').value,persons=getPersons(),person=persons.find(p=>p.id===personId); if(!date){toast('Select date');return;} const cowFat=parseFloat(document.getElementById('session-cow-fat').value)||0, bufFat=parseFloat(document.getElementById('session-buf-fat').value)||0; const animals=getAnimals(); const allCows=[...animals.filter(a=>a.type==='cow'),...extraCows]; const allBufs=[...animals.filter(a=>a.type==='buffalo'),...extraBufs]; let newSessions=[]; const cowEntries=allCows.map(a=>({animal_id:a.id,name:a.name,qty:parseFloat(document.getElementById('qty-cow-'+a.id)?.value||0)})).filter(e=>e.qty>0); const cowTotal=cowEntries.reduce((a,e)=>a+e.qty,0); if(cowTotal>0)newSessions.push({id:genId(),date,session:currentSession,milkType:'cow',fat:cowFat,totalQty:cowTotal,entries:cowEntries,person_id:personId,person:person?.name||''}); const bufEntries=allBufs.map(a=>({animal_id:a.id,name:a.name,qty:parseFloat(document.getElementById('qty-buffalo-'+a.id)?.value||0)})).filter(e=>e.qty>0); const bufTotal=bufEntries.reduce((a,e)=>a+e.qty,0); if(bufTotal>0)newSessions.push({id:genId(),date,session:currentSession,milkType:'buffalo',fat:bufFat,totalQty:bufTotal,entries:bufEntries,person_id:personId,person:person?.name||''}); if(!newSessions.length){toast('Enter at least one qty');return;} const existing=getSessions().filter(s=>!(s.date===date && s.session===currentSession && newSessions.some(n=>n.milkType===s.milkType))); saveSessions([...existing,...newSessions]); extraCows=[]; extraBufs=[]; toast(`✅ Session saved!`); renderEntryScreen(); syncToSheets();}
+function renderEntryScreen(){document.getElementById('entry-date').value=today(); const persons=getPersons(); document.getElementById('entry-person').innerHTML='<option value="">-- Select person --</option>'+persons.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''); extraCows=[]; extraBufs=[]; renderAnimalRows(); onDateOrSessionChange();}
 
-      DB.entries.push({ id, date, session: currentSession, type, liters, fat, amount: amt });
-      syncStorage();
-      alert(lang === 'en' ? "Collection record added!" : "संग्रह प्रविष्टि सुरक्षित की गई!");
-      clearEntryInputs();
-    }
+// ==================== CLIENT TYPE UI ====================
+function setClientTypeUI(type){
+  document.getElementById('cl-client-type').value=type;
+  document.getElementById('cl-type-bulk').classList.toggle('active',type==='bulk');
+  document.getElementById('cl-type-bulk').classList.toggle('bulk',type==='bulk');
+  document.getElementById('cl-type-retail').classList.toggle('active',type==='retail');
+  document.getElementById('cl-type-retail').classList.toggle('retail',type==='retail');
+  document.getElementById('bulk-milk-info').style.display=type==='bulk'?'block':'none';
+  document.getElementById('retail-milk-row').style.display=type==='retail'?'block':'none';
+}
 
-    function clearEntryInputs() {
-      document.getElementById('entry-id').value = '';
-      document.getElementById('entry-name').value = '';
-      document.getElementById('entry-liters').value = '';
-      document.getElementById('entry-fat').value = '';
-      document.getElementById('entry-amount').value = '0.00';
-    }
+// ==================== DISPATCH ====================
+let currentDispatchSession='morning';
+function setDispatchSession(s){currentDispatchSession=s; document.getElementById('btn-d-morn').classList.toggle('active',s==='morning'); document.getElementById('btn-d-eve').classList.toggle('active',s==='evening'); onDispatchDateChange();}
+function onDispatchDateChange(){const date=document.getElementById('dispatch-date').value||today(); const morningCow=getSessionFat(date,'morning','cow'), morningBuf=getSessionFat(date,'morning','buffalo'), eveningCow=getSessionFat(date,'evening','cow'), eveningBuf=getSessionFat(date,'evening','buffalo'); const el=document.getElementById('dispatch-fat-info'); if(el)el.innerHTML=`<div style="background:var(--amber-pale);padding:8px;border-radius:8px;margin-bottom:10px">📊 Fat: 🌅 🐄${morningCow?morningCow+'%':'—'} 🐃${morningBuf?morningBuf+'%':'—'} | 🌇 🐄${eveningCow?eveningCow+'%':'—'} 🐃${eveningBuf?eveningBuf+'%':'—'}</div>`; renderDispatchRows(date);}
+function renderDispatchRows(date){date=date||document.getElementById('dispatch-date').value||today(); const clients=getClients(); const el=document.getElementById('dispatch-client-rows'); if(!clients.length){el.innerHTML='<div style="font-size:13px;color:var(--text-soft)">No clients yet</div>';return;} const retailRates=getRetailRates(); const sessCow=getSessions().find(s=>s.date===date && s.session===currentDispatchSession && s.milkType==='cow'); const sessBuf=getSessions().find(s=>s.date===date && s.session===currentDispatchSession && s.milkType==='buffalo'); const cowQty=sessCow?.totalQty||0, bufQty=sessBuf?.totalQty||0, cowFat=sessCow?.fat||0, bufFat=sessBuf?.fat||0; const totalQty=cowQty+bufQty; const autoFat=totalQty>0?((cowFat*cowQty+bufFat*bufQty)/totalQty):0; el.innerHTML=clients.map(c=>{const isBulk=c.clientType==='bulk'; let rate=0; if(isBulk){rate=getCoopRate('mix',autoFat)||0;}else{rate=retailRates[c.milkType]||0;} return `<div class="dispatch-client-card ${isBulk?'bulk':'retail'}"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-weight:600">${c.name}</span><div><span class="badge ${isBulk?'badge-bulk':'badge-retail'}">${isBulk?'Bulk':'Retail'}</span><span class="badge badge-${c.milkType||(isBulk?'mix':c.milkType)}">${c.milkType||(isBulk?'mix':c.milkType)}</span></div></div><div class="form-row"><div><label class="form-label">Qty (L)</label><input type="number" class="form-input" id="d-qty-${c.id}" step="0.1" value="${c.daily_qty}"></div><div><label class="form-label">Rate ₹/L</label><input type="number" class="form-input" id="d-rate-${c.id}" step="0.5" value="${rate}"></div></div><div class="payment-toggle"><button onclick="setPaymentMode('${c.id}','credit')" id="pay-cr-${c.id}" style="flex:1;padding:6px">Credit</button><button onclick="setPaymentMode('${c.id}','cash')" id="pay-cs-${c.id}" style="flex:1;padding:6px">Cash</button></div><input type="hidden" id="payment-${c.id}" value="credit"></div>`;}).join('');}
+function setPaymentMode(clientId,mode){document.getElementById(`payment-${clientId}`).value=mode; const cr=document.getElementById(`pay-cr-${clientId}`), cs=document.getElementById(`pay-cs-${clientId}`); if(cr)cr.style.background=mode==='credit'?'#F39C12':'transparent'; if(cs)cs.style.background=mode==='cash'?'#27AE60':'transparent';}
+function saveDispatch(){const date=document.getElementById('dispatch-date').value; if(!date){toast('Select date');return;} const clients=getClients(); let entries=[]; clients.forEach(c=>{const qty=parseFloat(document.getElementById('d-qty-'+c.id)?.value||0); if(qty<=0)return; const rate=parseFloat(document.getElementById('d-rate-'+c.id)?.value||0); const payment=document.getElementById('payment-'+c.id)?.value||'credit'; entries.push({id:genId(),date,session:currentDispatchSession,client_id:c.id,client_name:c.name,clientType:c.clientType||'retail',milk_type:c.clientType==='bulk'?'mix':c.milkType,qty,fat:0,rate_per_litre:rate,payment_mode:payment});}); if(!entries.length){toast('Enter qty');return;} saveDispatches([...getDispatches(),...entries]); toast(`✅ ${entries.length} dispatches saved`); syncToSheets();}
+function renderClientsScreen(){document.getElementById('dispatch-date').value=today(); onDispatchDateChange(); renderClientList();}
+function renderClientList(){const clients=getClients(); const el=document.getElementById('client-list-display'); el.innerHTML=clients.map(c=>`<div class="list-item"><div><div class="list-item-name">${c.name}</div><div class="list-item-sub">${c.phone||'—'} · ${c.daily_qty} L/day · <span class="badge ${c.clientType==='bulk'?'badge-bulk':'badge-retail'}">${c.clientType==='bulk'?'Bulk':'Retail'}</span> <span class="badge badge-${c.milkType||(c.clientType==='bulk'?'mix':c.milkType)}">${c.milkType||(c.clientType==='bulk'?'mix':c.milkType)}</span></div></div><button class="btn btn-outline btn-sm" onclick="deleteClient('${c.id}')">✕</button></div>`).join('')||'<div style="color:var(--text-soft)">No clients yet</div>';}
+function showAddClient(){const f=document.getElementById('add-client-form'); f.style.display=f.style.display==='none'?'block':'none';}
+function addClient(){const name=document.getElementById('cl-name').value.trim(), phone=document.getElementById('cl-phone').value.trim(), clientType=document.getElementById('cl-client-type').value, milkType=clientType==='bulk'?'mix':document.getElementById('cl-milk-type').value, qty=parseFloat(document.getElementById('cl-qty').value); if(!name||!qty){toast('Enter name and quantity');return;} saveClients([...getClients(),{id:genId(),name,phone,clientType,milkType,daily_qty:qty}]); document.getElementById('cl-name').value=''; document.getElementById('cl-phone').value=''; document.getElementById('cl-qty').value=''; document.getElementById('add-client-form').style.display='none'; toast('Client added'); renderClientsScreen(); syncToSheets();}
+function deleteClient(id){if(!confirm('Remove?'))return; saveClients(getClients().filter(c=>c.id!==id)); renderClientsScreen(); syncToSheets();}
 
-    // ==================== DISPATCH LOGIC ====================
-    let currentDispSession = 'morning';
-    
-    function setDispatchSession(s) {
-      currentDispSession = s;
-      document.getElementById('btn-d-morn').classList.toggle('active', s === 'morning');
-      document.getElementById('btn-d-eve').classList.toggle('active', s === 'evening');
-    }
+// ==================== HOME ====================
+function renderHome(){const td=today(); const sessions=getSessions().filter(s=>s.date===td); const total=sessions.reduce((a,s)=>a+s.totalQty,0); const cow=sessions.filter(s=>s.milkType==='cow').reduce((a,s)=>a+s.totalQty,0); const buf=sessions.filter(s=>s.milkType==='buffalo').reduce((a,s)=>a+s.totalQty,0); document.getElementById('h-total').textContent=total.toFixed(1)+' L'; document.getElementById('h-sessions').textContent=sessions.length; document.getElementById('h-cow').textContent=cow.toFixed(1)+' L'; document.getElementById('h-buf').textContent=buf.toFixed(1)+' L'; const morningCow=getSessionFat(td,'morning','cow'), morningBuf=getSessionFat(td,'morning','buffalo'), eveningCow=getSessionFat(td,'evening','cow'), eveningBuf=getSessionFat(td,'evening','buffalo'); document.getElementById('home-fat-banner').innerHTML=(morningCow||morningBuf||eveningCow||eveningBuf)?`<div style="background:var(--amber-pale);padding:10px;border-radius:10px;margin-bottom:12px">🌅 Morning: 🐄${morningCow?morningCow+'%':'—'} 🐃${morningBuf?morningBuf+'%':'—'} | 🌇 Evening: 🐄${eveningCow?eveningCow+'%':'—'} 🐃${eveningBuf?eveningBuf+'%':'—'}</div>`:''; const morning=sessions.filter(s=>s.session==='morning'), evening=sessions.filter(s=>s.session==='evening'); document.getElementById('home-morning-list').innerHTML=morning.map(s=>`<div class="list-item"><div><div class="list-item-name">${s.milkType} Milk</div><div class="list-item-sub">Fat: ${s.fat}% · ${s.person||'—'}</div></div><div>${s.totalQty.toFixed(1)} L</div></div>`).join('')||'<div>No entries yet</div>'; document.getElementById('home-evening-list').innerHTML=evening.map(s=>`<div class="list-item"><div><div class="list-item-name">${s.milkType} Milk</div><div class="list-item-sub">Fat: ${s.fat}% · ${s.person||'—'}</div></div><div>${s.totalQty.toFixed(1)} L</div></div>`).join('')||'<div>No entries yet</div>';}
 
-    function saveDispatchRecord() {
-      const date = document.getElementById('dispatch-date').value || today();
-      const liters = parseFloat(document.getElementById('disp-liters').value) || 0;
-      const fat = parseFloat(document.getElementById('disp-fat').value) || 0;
-      const rate = parseFloat(document.getElementById('disp-rate').value) || 0;
+// ==================== BILLING ====================
+function renderBillingScreen(){document.getElementById('bill-month').value=new Date().toISOString().slice(0,7); const clients=getClients(); document.getElementById('bill-client').innerHTML='<option value="">All clients</option>'+clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');}
+function generateBill(){const month=document.getElementById('bill-month').value; const clientId=document.getElementById('bill-client').value; if(!month){toast('Select month');return;} const dispatches=getDispatches().filter(d=>d.date.startsWith(month)); const clients=getClients(); const targets=clientId?clients.filter(c=>c.id===clientId):clients; let html=''; targets.forEach(c=>{const cd=dispatches.filter(d=>d.client_id===c.id); if(!cd.length)return; const total=cd.reduce((a,d)=>a+(d.qty*d.rate_per_litre),0); const totalQty=cd.reduce((a,d)=>a+d.qty,0); const isBulk=c.clientType==='bulk'; html+=`<div class="card"><div class="card-title">🧾 ${c.name} — ${month} <span class="badge ${isBulk?'badge-bulk':'badge-retail'}">${isBulk?'Bulk':'Retail'}</span></div><table class="mini-table"><thead><th>Date</th><th>Qty</th>${isBulk?'<th>Fat%</th>':''}<th>Rate</th><th>Amount</th><th>Mode</th></thead><tbody>${cd.map(d=>`<td>${d.date.slice(5)}</td><td>${d.qty.toFixed(1)}L</td>${isBulk?`<td>${d.fat||'—'}%</td>`:''}<td>₹${d.rate_per_litre}</td><td>₹${(d.qty*d.rate_per_litre).toFixed(2)}</td><td><span class="badge badge-${d.payment_mode}">${d.payment_mode}</span></td></tr>`).join('')}</tbody><tfoot><tr><td colspan="2"><strong>Total</strong></td><td></td><td><strong>${fmtMoney(total)}</strong></td><td></td></tr></tfoot></table></div>`;}); document.getElementById('bill-output').innerHTML=html||'<div class="card">No data</div>';}
 
-      if (liters <= 0 || fat <= 0 || rate <= 0) {
-        alert(lang === 'en' ? "All factory values must be greater than 0!" : "सभी मान 0 से अधिक होने चाहिए!");
-        return;
-      }
+// ==================== SETUP ====================
+function renderSetupScreen(){renderCoopRates(); renderRetailRates(); renderAnimalListSetup(); renderPersonListSetup(); const key=getApiKey(); if(key){document.getElementById('api-key-status').innerHTML='✅ API key saved'; document.getElementById('api-key-input').value=key;} if(googleSheetsUrl){document.getElementById('sheets-script-url').value=googleSheetsUrl; document.getElementById('sheets-status').innerHTML='✅ '+(currentLang==='hi'?'कनेक्टेड':'Connected');}}
+function renderAnimalListSetup(){const a=getAnimals(); document.getElementById('animal-list-display').innerHTML=a.map(x=>`<div class="list-item"><div><span class="list-item-name">${x.name}</span><span class="badge badge-${x.type}">${x.type}</span></div><button class="btn btn-outline btn-sm" onclick="deleteAnimal('${x.id}')">✕</button></div>`).join('')||'<div>No animals yet</div>';}
+function renderPersonListSetup(){const p=getPersons(); document.getElementById('person-list-display').innerHTML=p.map(x=>`<div class="list-item"><div><span class="list-item-name">${x.name}</span>${x.phone?`<div class="list-item-sub">${x.phone}</div>`:''}</div><button class="btn btn-outline btn-sm" onclick="deletePerson('${x.id}')">✕</button></div>`).join('')||'<div>No persons yet</div>';}
+function addAnimal(){const n=document.getElementById('an-name').value.trim(), t=document.getElementById('an-type').value; if(!n)return; saveAnimals([...getAnimals(),{id:genId(),name:n,type:t}]); document.getElementById('an-name').value=''; renderAnimalListSetup(); toast('Animal added'); syncToSheets();}
+function deleteAnimal(id){saveAnimals(getAnimals().filter(a=>a.id!==id)); renderAnimalListSetup();}
+function addPerson(){const n=document.getElementById('ps-name').value.trim(), p=document.getElementById('ps-phone').value.trim(); if(!n)return; savePersons([...getPersons(),{id:genId(),name:n,phone:p}]); document.getElementById('ps-name').value=''; document.getElementById('ps-phone').value=''; renderPersonListSetup(); toast('Person added'); syncToSheets();}
+function deletePerson(id){savePersons(getPersons().filter(p=>p.id!==id)); renderPersonListSetup();}
+function saveApiKey(){const k=document.getElementById('api-key-input').value.trim(); if(!k)return; localStorage.setItem('openrouter_api_key',k); document.getElementById('api-key-status').innerHTML='✅ API key saved'; toast('API key saved');}
+function exportData(){const d={animals:getAnimals(),persons:getPersons(),clients:getClients(),sessions:getSessions(),dispatches:getDispatches(),fat_rates:getFatRates(),retail_rates:getRetailRates()}; const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='dairybook_'+today()+'.json'; a.click(); URL.revokeObjectURL(u); toast('Data exported');}
+function resetAllData(){if(!confirm('Delete ALL data?'))return; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k&&k.startsWith('dairy_'))localStorage.removeItem(k);} toast('Data reset'); setTimeout(()=>location.reload(),1000);}
+function loadSampleData(){if(!confirm('Load sample data?'))return; saveAnimals([{id:'a1',name:'Ganga',type:'cow'},{id:'a2',name:'Kali',type:'buffalo'}]); savePersons([{id:'p1',name:'Ramesh',phone:'9876543210'}]); saveClients([{id:'c1',name:'Sharma Dairy (Bulk)',phone:'9000000001',clientType:'bulk',milkType:'mix',daily_qty:40},{id:'c2',name:'Verma Ji (Retail)',phone:'9000000002',clientType:'retail',milkType:'cow',daily_qty:2}]); saveRetailRates({cow:46,buffalo:66}); saveFatRates([{id:'fr1',milk_type:'mix',fat:5.0,rate:44},{id:'fr2',milk_type:'mix',fat:5.5,rate:48},{id:'fr3',milk_type:'mix',fat:6.0,rate:52}]); toast('Sample data loaded!'); renderAll();}
 
-      const totalAmt = liters * (rate / 10) * fat;
-      DB.dispatch.push({ date, session: currentDispSession, liters, fat, rate, amount: totalAmt });
-      syncStorage();
+// ==================== AI ASSISTANT ====================
+let chatHistory=[];
+async function sendChat(){const i=document.getElementById('chat-input'); const m=i.value.trim(); if(!m)return; i.value=''; askAI(m);}
+async function askAI(msg){addMsg('user',msg); goTo('ai'); const key=getApiKey(); if(!key){addMsg('ai','❌ Enter API key in Setup'); return;} addMsg('ai','🤔 Thinking...'); const sessions=getSessions(); const dispatches=getDispatches(); const totalMilk=sessions.reduce((a,s)=>a+s.totalQty,0); const totalDispatch=dispatches.reduce((a,d)=>a+d.qty,0); const totalCash=dispatches.filter(d=>d.payment_mode==='cash').reduce((a,d)=>a+d.qty*d.rate_per_litre,0); setTimeout(()=>{const last=document.querySelector('#chat-messages .msg.ai:last-child'); if(last)last.querySelector('.msg-bubble').innerHTML=`📊 Summary\nTotal Milk: ${totalMilk.toFixed(1)}L\nDispatched: ${totalDispatch.toFixed(1)}L\nCash: ₹${totalCash.toFixed(0)}\nOutstanding: ₹${(dispatches.reduce((a,d)=>a+d.qty*d.rate_per_litre,0)-totalCash).toFixed(0)}`;},1000);}
+function addMsg(role,text){const ce=document.getElementById('chat-messages'); const d=document.createElement('div'); d.className='msg '+role; d.innerHTML=`<div class="msg-bubble">${text}</div><div class="msg-time">${new Date().toLocaleTimeString()}</div>`; ce.appendChild(d); ce.scrollTop=ce.scrollHeight;}
 
-      alert(lang === 'en' ? "Factory dispatch record saved successfully!" : "फैक्ट्री डिस्पैच रिकॉर्ड सुरक्षित किया गया!");
-      document.getElementById('disp-liters').value = '';
-      document.getElementById('disp-fat').value = '';
-      document.getElementById('disp-rate').value = '';
-    }
+// ==================== NAVIGATION ====================
+let currentScreen='home';
+function goTo(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('active')); document.getElementById('screen-'+name).classList.add('active'); const idx=['home','entry','clients','billing','ai','setup'].indexOf(name); if(idx>=0)document.querySelectorAll('.bnav-item')[idx].classList.add('active'); currentScreen=name; if(name==='home')renderHome(); if(name==='entry')renderEntryScreen(); if(name==='clients')renderClientsScreen(); if(name==='billing')renderBillingScreen(); if(name==='setup'){renderSetupScreen();updateFiscalYearDisplay();}}
 
-    // ==================== FARMERS MANAGEMENT ====================
-    function addFarmerProfile() {
-      const id = document.getElementById('new-farmer-id').value.trim();
-      const name = document.getElementById('new-farmer-name').value.trim();
+// ==================== RENDER ALL ====================
+function renderAll(){renderHome(); if(currentScreen==='entry')renderEntryScreen(); if(currentScreen==='clients')renderClientsScreen(); if(currentScreen==='billing')renderBillingScreen(); if(currentScreen==='setup'){renderSetupScreen();updateFiscalYearDisplay();}}
 
-      if (!id || !name) {
-        alert(lang === 'en' ? "Missing data configurations!" : "डेटा कॉन्फ़िगरेशन गुम है!");
-        return;
-      }
-      if (DB.farmers[id]) {
-        alert(lang === 'en' ? "ID slot collision found!" : "आईडी स्लॉट टकराव मिला!");
-        return;
-      }
-
-      DB.farmers[id] = name;
-      syncStorage();
-      document.getElementById('new-farmer-id').value = '';
-      document.getElementById('new-farmer-name').value = '';
-      renderFarmersList();
-    }
-
-    function renderFarmersList() {
-      const tbody = document.getElementById('table-farmers-body');
-      tbody.innerHTML = '';
-      for (let id in DB.farmers) {
-        tbody.innerHTML += `<tr><td><strong>#${id}</strong></td><td>${DB.farmers[id]}</td></tr>`;
-      }
-      if (Object.keys(DB.farmers).length === 0) {
-        tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-muted);">${lang === 'en' ? 'No farmers registered' : 'कोई किसान पंजीकृत नहीं'}</td></tr>`;
-      }
-    }
-
-    // ==================== BILLING REPORTS ====================
-    function generateBill() {
-      const start = document.getElementById('bill-start').value;
-      const end = document.getElementById('bill-end').value;
-      const output = document.getElementById('billing-results-output');
-
-      if (!start || !end) {
-        alert(lang === 'en' ? "Select date range!" : "तिथि सीमा चुनें!");
-        return;
-      }
-
-      const customerStatements = {};
-      DB.entries.forEach(e => {
-        if (e.date >= start && e.date <= end) {
-          if (!customerStatements[e.id]) customerStatements[e.id] = [];
-          customerStatements[e.id].push(e);
-        }
-      });
-
-      let html = `<h2 style="margin-top:10px">${lang === 'en' ? 'Compiled Invoices' : 'संकलित बिल सूची'}</h2>`;
-      let zeroRecords = true;
-
-      for (let clientId in customerStatements) {
-        zeroRecords = false;
-        const records = customerStatements[clientId];
-        let clientLiters = 0, clientTotalCash = 0;
-        let tableRows = '';
-
-        records.forEach(r => {
-          clientLiters += r.liters;
-          clientTotalCash += r.amount;
-          tableRows += `<tr>
-            <td>${r.date.substring(5)}</td>
-            <td>${r.type === 'cow' ? '🐄 Cow' : '🦬 Buffalo'}</td>
-            <td>${r.liters.toFixed(1)}L</td>
-            <td>${r.fat.toFixed(1)}</td>
-            <td>₹${r.amount.toFixed(2)}</td>
-          </tr>`;
-        });
-
-        html += `
-        <div class="card" style="margin-top:12px">
-          <div style="font-weight:700; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom:8px;">
-            #${clientId} - ${DB.farmers[clientId] || 'Unknown'}
-          </div>
-          <table class="mini-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Liters</th>
-                <th>Fat%</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>${tableRows}</tbody>
-            <tfoot>
-              <tr style="background: var(--primary-light);">
-                <td colspan="2"><strong>Total:</strong></td>
-                <td><strong>${clientLiters.toFixed(1)}L</strong></td>
-                <td></td>
-                <td><strong>₹${clientTotalCash.toFixed(2)}</strong></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>`;
-      }
-      output.innerHTML = zeroRecords ? `<div class="card" style="text-align:center; padding:20px;">${lang === 'en' ? 'No matching records found.' : 'कोई मिलान रिकॉर्ड नहीं मिला।'}</div>` : html;
-    }
-
-    // ==================== AI PAYLOAD ====================
-    function generateAIPayload() {
-      let totalInLiters = 0, totalInCost = 0;
-      DB.entries.forEach(e => { totalInLiters += e.liters; totalInCost += e.amount; });
-
-      let totalOutLiters = 0, totalOutRevenue = 0;
-      DB.dispatch.forEach(d => { totalOutLiters += d.liters; totalOutRevenue += d.amount; });
-
-      const margin = totalOutRevenue - totalInCost;
-      const marginPercent = totalInCost > 0 ? (margin / totalInCost * 100).toFixed(2) : 0;
-
-      const promptStr = `You are an expert dairy business consultant AI assistant. Analyze my local collection plant data metrics down below:
-
-📊 DATA SUMMARY:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 Farmer Payments:
-   - Total Milk Purchased: ${totalInLiters.toFixed(2)} Liters
-   - Cash Disbursed to Farmers: ₹${totalInCost.toFixed(2)}
-   - Average Purchase Price: ₹${(totalInLiters > 0 ? totalInCost / totalInLiters : 0).toFixed(2)}/L
-
-🏭 Factory Dispatch:
-   - Total Outbound Dispatch: ${totalOutLiters.toFixed(2)} Liters
-   - Revenue Received From Factory: ₹${totalOutRevenue.toFixed(2)}
-   - Average Selling Price: ₹${(totalOutLiters > 0 ? totalOutRevenue / totalOutLiters : 0).toFixed(2)}/L
-
-📈 Profit Analysis:
-   - Net Profit Margin: ₹${margin.toFixed(2)}
-   - Profit Percentage: ${marginPercent}%
-   - Volume Shrinkage: ${(totalInLiters - totalOutLiters).toFixed(2)} Liters (${totalInLiters > 0 ? ((totalInLiters - totalOutLiters) / totalInLiters * 100).toFixed(2) : 0}%)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Please provide:
-1. Strategic optimization insights to maximize milk plant operation health
-2. Fat shrinkage loss analysis and recommendations
-3. Pricing strategy suggestions
-4. Operational efficiency improvements
-
-Be specific and actionable in your recommendations.`;
-
-      document.getElementById('ai-textarea').value = promptStr;
-      document.getElementById('ai-prompt-box').style.display = 'block';
-    }
-
-    // ==================== SETUP & DEMO ====================
-    function loadSandboxDemoData() {
-      DB.farmers = { "101": "Rajesh Kumar", "102": "Sanjay Singh", "103": "Amit Patel" };
-      
-      const todayStr = today();
-      DB.rates = { [`${todayStr}_morning`]: { cow: 72, buffalo: 102 } };
-      
-      DB.entries = [
-        { id: "101", date: todayStr, session: "morning", type: "cow", liters: 12.5, fat: 4.2, amount: 37.80 },
-        { id: "102", date: todayStr, session: "morning", type: "buffalo", liters: 8.0, fat: 6.8, amount: 55.48 },
-        { id: "103", date: todayStr, session: "morning", type: "cow", liters: 15.0, fat: 4.5, amount: 48.60 }
-      ];
-      
-      DB.dispatch = [
-        { date: todayStr, session: "morning", liters: 35.5, fat: 5.2, rate: 106, amount: 195.88 }
-      ];
-      
-      syncStorage();
-      alert(lang === 'en' ? "Sandbox test profiles initialized!" : "सैंडबॉक्स परीक्षण प्रोफाइल आरंभीकृत!");
-      
-      // Refresh UI
-      onDateOrSessionChange();
-      if (document.getElementById('screen-farmers').classList.contains('active')) {
-        renderFarmersList();
-      }
-    }
-
-    function wipeLocalDatabase() {
-      if (confirm(lang === 'en' ? "Are you absolutely sure you want to delete all storage data logs permanently?" : "क्या आप सभी स्टोरेज डेटा को स्थायी रूप से हटाना चाहते हैं?")) {
-        localStorage.removeItem('dairybook_db_v1');
-        DB = { farmers: {}, rates: {}, entries: [], dispatch: [] };
-        alert(lang === 'en' ? "Database wiped!" : "डेटाबेस साफ़ हो गया!");
-        location.reload();
-      }
-    }
-
-    // ==================== SERVICE WORKER REGISTRATION ====================
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker registered:', reg.scope))
-          .catch(err => console.log('Service Worker error:', err));
-      });
-    }
-
-    // ==================== INITIALIZATION ====================
-    window.addEventListener('DOMContentLoaded', () => {
-      loadLocalStorageEngine();
-      
-      // Set default dates
-      const todayStr = today();
-      document.getElementById('entry-date').value = todayStr;
-      document.getElementById('dispatch-date').value = todayStr;
-      document.getElementById('bill-start').value = todayStr;
-      document.getElementById('bill-end').value = todayStr;
-      
-      // Set language
-      setLanguage();
-      
-      // Initialize session
-      onDateOrSessionChange();
-      
-      // Set default active session buttons
-      document.getElementById('btn-morning').classList.add('active');
-      document.getElementById('btn-d-morn').classList.add('active');
-      
-      // Render farmers list if needed
-      renderFarmersList();
-    });
-  </script>
+// ==================== INIT ====================
+function init(){document.getElementById('todayDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}); if(!localStorage.getItem('current_fiscal_year'))localStorage.setItem('current_fiscal_year',getCurrentFiscalYear()); setLanguage(currentLang); updateFiscalYearDisplay(); renderAll();}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW error:',e));});}
+init();
+</script>
 </body>
 </html>
